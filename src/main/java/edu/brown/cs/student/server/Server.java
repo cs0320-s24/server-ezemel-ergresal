@@ -1,9 +1,7 @@
 package edu.brown.cs.student.server;
+
 import static spark.Spark.after;
 
-//import edu.brown.cs.student.main.soup.Soup;
-//import edu.brown.cs.student.main.soup.SoupAPIUtilities;
-import java.util.ArrayList;
 import java.util.List;
 import spark.Spark;
 
@@ -17,8 +15,7 @@ import spark.Spark;
  * all had the same shared state.
  */
 public class Server {
-  // TODO 0: Read through this class and determine the shape of this project...
-  // What are the endpoints that we can access... What happens if you go to them?
+
   public static void main(String[] args) {
     int port = 3232;
     Spark.port(port);
@@ -27,10 +24,21 @@ public class Server {
           response.header("Access-Control-Allow-Origin", "*");
           response.header("Access-Control-Allow-Methods", "*");
         });
+
+    LoadCSVHandler loadCSVHandler = new LoadCSVHandler();
+
+    Spark.get("loadcsv", loadCSVHandler);
+
     Spark.init();
     Spark.awaitInitialization();
 
-    // Notice this link alone leads to a 404... Why is that?
+    List<List<String>> data = loadCSVHandler.getCsvData();
+    List<String> columnHeaders = loadCSVHandler.getColumnHeaders();
+    //TODO: rn the data and columnHeaders fields are not being initialized correctly, they are null always
+    Spark.get("viewcsv", new ViewCSVHandler(data, columnHeaders));
+    Spark.get("searchcsv", new SearchCSVHandler(data, columnHeaders));
+
     System.out.println("Server started at http://localhost:" + port);
 
-}}
+  }
+}
