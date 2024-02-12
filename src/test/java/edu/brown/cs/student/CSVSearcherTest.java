@@ -133,7 +133,7 @@ public class CSVSearcherTest {
   public void testNewFileSearch() throws IOException {
     ParseCSV<String> fileReader =
         new ParseCSV<String>(
-            new FileReader("/Users/bittygresalfi/Desktop/cs32/csv-bitttyy/data/census/riicome.csv"),
+            new FileReader("/Users/bittygresalfi/Desktop/cs32/csv-bitttyy/data/census/ri_income.csv"),
             myCreator,
             true);
     List<List<String>> fileData = fileReader.getParsedData();
