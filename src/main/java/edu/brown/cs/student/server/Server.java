@@ -1,10 +1,7 @@
 package edu.brown.cs.student.server;
+
 import static spark.Spark.after;
 
-//import edu.brown.cs.student.main.soup.Soup;
-//import edu.brown.cs.student.main.soup.SoupAPIUtilities;
-import java.util.ArrayList;
-import java.util.List;
 import spark.Spark;
 
 /**
@@ -32,5 +29,5 @@ public class Server {
 
     // Notice this link alone leads to a 404... Why is that?
     System.out.println("Server started at http://localhost:" + port);
-
-}}
+  }
+}
