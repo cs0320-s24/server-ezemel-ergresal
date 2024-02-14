@@ -1,7 +1,8 @@
 package edu.brown.cs.student.Broadband;
 
-import static java.lang.FdLibm.Cbrt.F;
+//import static java.lang.FdLibm.Cbrt.F;
 
+import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.CSVNotLoadedResponse;
 import edu.brown.cs.student.Place.Place;
@@ -50,8 +51,7 @@ public class BroadbandHandler implements Route {
     // to be fulfilled.
     // If you specify a queryParam, you can access it by appending ?parameterName=name to the
     // endpoint
-    // ex. http://localhost:3232/activity?participants=num
-    Set<String> params = request.queryParams();
+//    Set<String> params = request.queryParams();
     String county = request.queryParams("county");
     String state = request.queryParams("state");
 
@@ -65,6 +65,8 @@ public class BroadbandHandler implements Route {
       Place place = PlaceAPIUtilities.deserializePlace(placeJson);
       // Adds results to the responseMap
       responseMap.put("result", "success");
+      responseMap.put("state", state);
+      responseMap.put("county", county);
       responseMap.put("place", place);
       return responseMap;
     } catch (Exception e) {
@@ -72,7 +74,7 @@ public class BroadbandHandler implements Route {
       // This is a relatively unhelpful exception message. An important part of this sprint will be
       // in learning to debug correctly by creating your own informative error messages where Spark
       // falls short.
-      responseMap.put("result", "Exception");
+      responseMap.put("result", e);
     }
     return responseMap;
   }
@@ -80,29 +82,35 @@ public class BroadbandHandler implements Route {
 
   private String sendRequest(String county, String state)
       throws URISyntaxException, IOException, InterruptedException {
-    // Build a request to this BoredAPI. Try out this link in your browser, what do you see?
-    // TODO 1: Looking at the documentation, how can we add to the URI to query based
-    // on participant number?
 //    https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&
 //     first neeed to convert county and state into number codes
-    URL requestURL = new URL("https", "api.census.gov",
-        "/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:45");
+//    URL requestURL = new URL("https", "api.census.gov",
+//        "/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:45");
 
-    HttpURLConnection clientConnection = connect(requestURL);
+    String urlString = String.format("https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:%s&in=state:%s", county, state);
+    URI requestURI = new URI(urlString);
+
+    // Build the HTTP request
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(requestURI)
+        .GET()
+        .build();
+
+    // Send the HTTP request and store the response
+    HttpResponse<String> response = HttpClient.newHttpClient()
+        .send(request, HttpResponse.BodyHandlers.ofString());
+
+    System.out.println(response);
+    System.out.println(response.body());
+
+    // deserialize the JSON response if needed
     Moshi moshi = new Moshi.Builder().build();
+    JsonAdapter<BroadbandResponse> adapter = moshi.adapter(BroadbandResponse.class);
+    BroadbandResponse responseData = adapter.fromJson(response.body());
 
-    // Send that API request then store the response in this variable. Note the generic type.
-    HttpResponse<String> BroadBandResponse =
-        HttpClient.newBuilder()
-            .build()
-            .send(requestURL, HttpResponse.BodyHandlers.ofString());
 
-    // What's the difference between these two lines? Why do we return the body? What is useful from
-    // the raw response (hint: how can we use the status of response)?
-    System.out.println(BroadBandResponse);
-    System.out.println(BroadBandResponse.body());
-
-    return BroadBandResponse.body();
+    return response.body();
+//    return broadbandResponse.toString();
   }
 
   /**
