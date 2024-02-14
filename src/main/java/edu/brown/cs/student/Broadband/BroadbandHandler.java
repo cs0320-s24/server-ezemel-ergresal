@@ -18,6 +18,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import spark.Request;
@@ -60,7 +61,7 @@ public class BroadbandHandler implements Route {
     try {
       // Sends a request to the API and receives JSON back
       String placeJson = this.sendRequest(county, state);
-return placeJson;
+      return placeJson;
       // Deserializes JSON into an Activity
 //      return
 //      String county = PlaceAPIUtilities.deserializePlace(countyJson);
@@ -89,6 +90,7 @@ return placeJson;
 //        http://localhost:3232/broadband?state=36&county=059
 
     String urlString = String.format("https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:%s&in=state:%s", county, state);
+    System.out.println(urlString);
     URI requestURI = new URI(urlString);
 
     // Build the HTTP request
@@ -106,8 +108,9 @@ return placeJson;
 
     // deserialize the JSON response if needed
     Moshi moshi = new Moshi.Builder().build();
-    JsonAdapter<BroadbandResponse> adapter = moshi.adapter(BroadbandResponse.class);
-    BroadbandResponse responseData = adapter.fromJson(response.body());
+    JsonAdapter<List> adapter = moshi.adapter(List.class);
+    List<List<String>> responseData = adapter.fromJson(response.body());
+//    BroadbandResponse responseData = adapter.fromJson(response.body());
 
 
     return response.body();
