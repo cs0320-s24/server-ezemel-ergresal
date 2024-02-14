@@ -60,15 +60,16 @@ public class BroadbandHandler implements Route {
     try {
       // Sends a request to the API and receives JSON back
       String placeJson = this.sendRequest(county, state);
-
+return placeJson;
       // Deserializes JSON into an Activity
-      Place place = PlaceAPIUtilities.deserializePlace(placeJson);
-      // Adds results to the responseMap
-      responseMap.put("result", "success");
-      responseMap.put("state", state);
-      responseMap.put("county", county);
-      responseMap.put("place", place);
-      return responseMap;
+//      return
+//      String county = PlaceAPIUtilities.deserializePlace(countyJson);
+//      // Adds results to the responseMap
+//      responseMap.put("result", "success");
+//      responseMap.put("state", state);
+//      responseMap.put("county", county);
+//      responseMap.put("place", place);
+//      return responseMap;
     } catch (Exception e) {
       e.printStackTrace();
       // This is a relatively unhelpful exception message. An important part of this sprint will be
@@ -85,7 +86,7 @@ public class BroadbandHandler implements Route {
 //    https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&
 //     first neeed to convert county and state into number codes
 //    URL requestURL = new URL("https", "api.census.gov",
-//        "/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:45");
+//        http://localhost:3232/broadband?state=36&county=059
 
     String urlString = String.format("https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:%s&in=state:%s", county, state);
     URI requestURI = new URI(urlString);

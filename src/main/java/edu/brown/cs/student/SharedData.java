@@ -19,7 +19,6 @@ public class SharedData {
   }
 
   public List<List<String>> getCsvData() {
-    System.out.println("in shareddata:   " +csvData);
     return csvData;
   }
 
