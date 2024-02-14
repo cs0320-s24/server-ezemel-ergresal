@@ -2,6 +2,7 @@ package edu.brown.cs.student.server;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import edu.brown.cs.student.CSVNotLoadedResponse;
 import edu.brown.cs.student.Searcher.SearchCSV;
 import edu.brown.cs.student.SharedData;
 import java.util.HashMap;
@@ -27,6 +28,9 @@ public class SearchCSVHandler<T> implements Route {
   public Object handle(Request request, Response response) throws Exception {
     Map<String, Object> responseMap = new HashMap<>();
     SearchCSV<String> searcherData = new SearchCSV<>();
+    if(this.sd.isEmpty()) {
+      return new CSVNotLoadedResponse(responseMap).serialize();
+    }
     String object = request.queryParams("object");
     String column = request.queryParams("column");
     if (object == null){
@@ -84,6 +88,24 @@ public class SearchCSVHandler<T> implements Route {
       return moshi.adapter(SearchCSVHandler.ObjectNotFoundResponse.class).toJson(this);
     }
   }
+
+//  /**
+//   * Response object to send if no csv loaded
+//   */
+//  public record CSVNotLoadedResponse(String error_retrieving_data) {
+//
+//    public CSVNotLoadedResponse(Map<String, Object> responseMap) {
+//      this("No CSV data loaded.");
+//    }
+//
+//    /**
+//     * @return this response, serialized as Json
+//     */
+//    String serialize() {
+//      Moshi moshi = new Moshi.Builder().build();
+//      return moshi.adapter(SearchCSVHandler.CSVNotLoadedResponse.class).toJson(this);
+//    }
+//  }
 
 
 }

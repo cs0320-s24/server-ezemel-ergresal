@@ -32,7 +32,7 @@ public class LoadCSVHandler implements Route {
   @Override
   public Object handle(Request request, Response response) throws Exception {
     String filename = request.queryParams("filename");
-    String columnHeaders = request.queryParams("columnHeaders");
+    String columnHeaders = request.queryParams("columnheaders");
     Boolean columnHeadersQuery = false;
     if (columnHeaders != null) {
       if (columnHeaders.equals("true")) { //default is false??
@@ -54,7 +54,7 @@ public class LoadCSVHandler implements Route {
     this.columnHeaders = fileReader.getColumnHeaders();
     responseMap.put("data", this.csvData);
     responseMap.put("columnHeaders", this.columnHeaders);
-    return request.queryParams("filename")+" loaded successfully!" + this.sharedData.getCsvData().toString();
+    return request.queryParams("filename")+" loaded successfully!";
 //    return new FileFoundResponse(responseMap).serialize();
   }
 
