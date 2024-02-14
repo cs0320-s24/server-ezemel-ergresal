@@ -39,12 +39,13 @@ public class SearchCSVHandler<T> implements Route {
     Boolean columnHeaders = !(this.sd.getColumnHeaders().isEmpty());
     List<List<String>> foundRows = searcherData.getRowsFound(sd.getCsvData(), sd.getColumnHeaders(), object, columnHeaders, column);
     responseMap.put("found rows", foundRows);
-//    return sd.getCsvData().toString();
+    if (foundRows.isEmpty()) {
+      return new ObjectNotFoundResponse(responseMap).serialize();
+    }
     return new ObjectFoundResponse(responseMap).serialize();
   }
 
   public record ObjectFoundResponse(String object_found, Map<String, Object> responseMap) {
-
     public ObjectFoundResponse(Map<String, Object> responseMap) {
       this("Object found", responseMap);
     }

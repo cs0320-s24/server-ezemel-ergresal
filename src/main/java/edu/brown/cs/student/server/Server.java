@@ -3,6 +3,7 @@ package edu.brown.cs.student.server;
 import static spark.Spark.after;
 
 
+import edu.brown.cs.student.Broadband.BroadbandHandler;
 import edu.brown.cs.student.SharedData;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,11 +42,11 @@ public class Server {
 
     List<List<String>> data = loadCSVHandler.getCsvData();
     List<String> columnHeaders = loadCSVHandler.getColumnHeaders();
-    //TODO: rn the data and columnHeaders fields are not being initialized correctly, they are null always
     Spark.get("viewcsv",
         new ViewCSVHandler(sharedData));
     Spark.get("searchcsv",
         new SearchCSVHandler(sharedData));
+    Spark.get("broadband", new BroadbandHandler());
     Spark.init();
     Spark.awaitInitialization();
     System.out.println("Server started at http://localhost:" + port);
