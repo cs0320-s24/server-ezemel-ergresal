@@ -22,10 +22,10 @@ public class Server {
     int port = 3232;
     Spark.port(port);
     after(
-        (request, response) -> {
-          response.header("Access-Control-Allow-Origin", "*");
-          response.header("Access-Control-Allow-Methods", "*");
-        });
+            (request, response) -> {
+              response.header("Access-Control-Allow-Origin", "*");
+              response.header("Access-Control-Allow-Methods", "*");
+            });
 
     LoadCSVHandler loadCSVHandler = new LoadCSVHandler();
 

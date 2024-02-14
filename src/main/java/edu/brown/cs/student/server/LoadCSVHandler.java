@@ -38,7 +38,7 @@ public class LoadCSVHandler implements Route {
     responseMap = new HashMap<>();
     ParseCSV<String> fileReader;
     CreatorFromRow<String> myCreator = new StringCreatorFromRow();
-    try { //maybe we should make parameter for columnHeaders boolean, with deafult = 1 or something
+    try { //maybe we should make parameter for columnHeaders boolean, with default = 1 or something
       fileReader = new ParseCSV<String>(new FileReader(filename), myCreator, columnHeadersQuery);
     } catch (FileNotFoundException f) {
       return new FileNotFoundResponse().serialize();
