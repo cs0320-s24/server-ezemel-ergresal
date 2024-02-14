@@ -2,6 +2,7 @@ package edu.brown.cs.student.server;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import edu.brown.cs.student.SharedData;
 import java.util.List;
 import spark.Request;
 import spark.Response;
@@ -15,9 +16,10 @@ public class ViewCSVHandler implements Route {
   private List<List<String>> data;
   private List<String> ch;
 
-  public ViewCSVHandler(List<List<String>> data, List<String> columnHeaders) {
-    this.data = data;
-    this.ch = columnHeaders;
+  public ViewCSVHandler(SharedData sharedData) {
+    this.data = sharedData.getCsvData();
+    this.ch = sharedData.getColumnHeaders();
+    System.out.println("in view csv handler:  " + this.data);
   }
 
   @Override
@@ -26,6 +28,7 @@ public class ViewCSVHandler implements Route {
 //    ;
 //    responseMap.put("data", this.data);
 //    responseMap.put("columnHeaders", this.ch);
+
     return this.ch + "\n" + this.data; //rn they are both null
   }
 

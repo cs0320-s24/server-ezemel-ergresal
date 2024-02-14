@@ -5,6 +5,7 @@ import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.Parser.CreatorFromRow;
 import edu.brown.cs.student.Parser.ParseCSV;
 import edu.brown.cs.student.Parser.StringCreatorFromRow;
+import edu.brown.cs.student.SharedData;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.HashMap;
@@ -22,15 +23,19 @@ public class LoadCSVHandler implements Route {
   static Map<String, Object> responseMap;
   private List<List<String>> csvData;
   private List<String> columnHeaders;
+  private SharedData sharedData;
 
+  public LoadCSVHandler(SharedData sharedData){
+    this.sharedData = sharedData;
+  }
   @Override
   public Object handle(Request request, Response response) throws Exception {
     String filename = request.queryParams("filename");
     String columnHeaders = request.queryParams("columnHeaders");
-    Boolean columnHeadersQuery = true;
+    Boolean columnHeadersQuery = false;
     if (columnHeaders != null) {
-      if (columnHeaders.equals("false")) { //default is false??
-        columnHeadersQuery = false;
+      if (columnHeaders.equals("true")) { //default is false??
+        columnHeadersQuery = true;
       }
     }
     String currentPath = new java.io.File(".").getCanonicalPath();
@@ -43,11 +48,13 @@ public class LoadCSVHandler implements Route {
     } catch (FileNotFoundException f) {
       return new FileNotFoundResponse().serialize();
     }
+    this.sharedData.put(fileReader.getParsedData(), fileReader.getColumnHeaders());
     this.csvData = fileReader.getParsedData();
     this.columnHeaders = fileReader.getColumnHeaders();
-    responseMap.put("data", csvData);
-    responseMap.put("columnHeaders", columnHeaders);
-    return new FileFoundResponse(responseMap).serialize();
+    responseMap.put("data", this.csvData);
+    responseMap.put("columnHeaders", this.columnHeaders);
+    return request.queryParams("filename")+" loaded successfully!" + this.sharedData.getCsvData().toString();
+//    return new FileFoundResponse(responseMap).serialize();
   }
 
   /**
@@ -79,12 +86,12 @@ public class LoadCSVHandler implements Route {
   }
 
   /**
-   * Response object to send if someone requested soup from an empty Menu
+   * Response object to send if file is not found
    */
   public record FileNotFoundResponse(String response_type) {
 
     public FileNotFoundResponse() {
-      this("error");
+      this("Error: Specified file not found in the protected data directory.");
     }
 
     /**
@@ -97,11 +104,15 @@ public class LoadCSVHandler implements Route {
   }
 
   public List<List<String>> getCsvData() {
-    return csvData;
+    return this.csvData;
   }
 
   public List<String> getColumnHeaders() {
-    return columnHeaders;
+    return this.columnHeaders;
+  }
+
+  public SharedData getSharedData() {
+    return sharedData;
   }
 }
 

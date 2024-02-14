@@ -3,6 +3,8 @@ package edu.brown.cs.student.server;
 import static spark.Spark.after;
 
 
+import edu.brown.cs.student.SharedData;
+import java.util.ArrayList;
 import java.util.List;
 
 import spark.Spark;
@@ -18,16 +20,20 @@ import spark.Spark;
  */
 public class Server {
 
-  public static void main(String[] args) {
+  private SharedData sharedData;
+
+  public Server(SharedData toUse) {
+    this.sharedData = toUse;
+
     int port = 3232;
     Spark.port(port);
     after(
-            (request, response) -> {
-              response.header("Access-Control-Allow-Origin", "*");
-              response.header("Access-Control-Allow-Methods", "*");
-            });
+        (request, response) -> {
+          response.header("Access-Control-Allow-Origin", "*");
+          response.header("Access-Control-Allow-Methods", "*");
+        });
 
-    LoadCSVHandler loadCSVHandler = new LoadCSVHandler();
+    LoadCSVHandler loadCSVHandler = new LoadCSVHandler(sharedData);
 
     Spark.get("loadcsv", loadCSVHandler);
 
@@ -37,10 +43,18 @@ public class Server {
     List<List<String>> data = loadCSVHandler.getCsvData();
     List<String> columnHeaders = loadCSVHandler.getColumnHeaders();
     //TODO: rn the data and columnHeaders fields are not being initialized correctly, they are null always
-    Spark.get("viewcsv", new ViewCSVHandler(data, columnHeaders));
-    Spark.get("searchcsv", new SearchCSVHandler(data, columnHeaders));
+    Spark.get("viewcsv",
+        new ViewCSVHandler(sharedData));
+    Spark.get("searchcsv",
+        new SearchCSVHandler(sharedData.getCsvData(), sharedData.getColumnHeaders()));
 
     System.out.println("Server started at http://localhost:" + port);
+  }
 
+  public static void main(String[] args) {
+    Server server = new Server(new SharedData(new ArrayList<>(), new ArrayList<>()));
+    // Notice that this runs, but the program continues executing. Why
+    // do you think that is? (We'll address this in a couple of weeks.)
+    System.out.println("Server started; exiting main...");
   }
 }
