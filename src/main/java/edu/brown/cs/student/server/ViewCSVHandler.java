@@ -13,13 +13,10 @@ import spark.Route;
  */
 public class ViewCSVHandler implements Route {
 
-  private List<List<String>> data;
-  private List<String> ch;
 
+private SharedData sh;
   public ViewCSVHandler(SharedData sharedData) {
-    this.data = sharedData.getCsvData();
-    this.ch = sharedData.getColumnHeaders();
-    System.out.println("in view csv handler:  " + this.data);
+    this.sh = sharedData;
   }
 
   @Override
@@ -28,8 +25,8 @@ public class ViewCSVHandler implements Route {
 //    ;
 //    responseMap.put("data", this.data);
 //    responseMap.put("columnHeaders", this.ch);
-
-    return this.ch + "\n" + this.data; //rn they are both null
+//    return sh.getCsvData().toString();
+    return this.sh.getColumnHeaders() + "\n" + this.sh.getCsvData(); //rn they are both null
   }
 
   public record parsedData(List<List<String>> data, List<String> columnHeaders) {

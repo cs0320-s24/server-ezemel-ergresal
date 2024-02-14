@@ -11,6 +11,7 @@ public class SearchCSV<T> {
   private Set<Integer> rowChecked = new HashSet<>(); // global variable so doesn't change upon recursion
   private List<List<T>> rowsFound;
 
+
   /**
    * constructor for if column not specified, this means we will search all columns
    *
@@ -19,7 +20,7 @@ public class SearchCSV<T> {
    * @return boolean, whether or not element was found in any of the columns
    * @throws IOException
    */
-  public List<List<T>> startSearcher(List<List<T>> data, Object object) {
+  public Boolean startSearcher(List<List<T>> data, Object object) {
     List<T> columnHeaders = new ArrayList<>();
     return startSearcher(data, columnHeaders, object, false, -1);
   }
@@ -37,7 +38,7 @@ public class SearchCSV<T> {
    * @return whether or not item was found in the specified column
    * @throws IOException
    */
-  public List<List<T>> startSearcher(
+  public Boolean startSearcher(
       List<List<T>> data,
       List<T> columnHeaders,
       Object object,
@@ -47,7 +48,7 @@ public class SearchCSV<T> {
     if (columnHeadersBoolean && columnHeaders.isEmpty()) {
       System.err.println(
           "No available column headers. Try searching without column specifier or using index instead.");
-      return this.rowsFound;
+      return false;
     }
     int columnI = -1;
     if (column == null){
@@ -64,7 +65,7 @@ public class SearchCSV<T> {
               "Column "
                   + columnI
                   + " doesn't exist"); // User may put either nothing or -1 to search all columns
-          return this.rowsFound;
+          return false;
         }
       } catch (NumberFormatException | ClassCastException e) {
       }
@@ -84,7 +85,7 @@ public class SearchCSV<T> {
         }
         if (columnI == -1) {
           System.err.println("Unable to read file column");
-          return this.rowsFound;
+          return false;
         }
       }
     }
@@ -93,9 +94,9 @@ public class SearchCSV<T> {
 
     if ((found == 0)) {
       System.err.println("'" + object + "'" + " not found");
-      return this.rowsFound;
+      return false;
     }
-    return this.rowsFound;
+    return true;
   }
 
   /**
@@ -144,7 +145,8 @@ public class SearchCSV<T> {
     return numFound;
   }
 
-  public List<List<T>> getRowsFound() {
-    return rowsFound;
+  public List<List<T>> getRowsFound(List<List<T>> data, List<T> ch, Object object, Boolean columnHeaders, Object column) {
+    startSearcher(data, ch, object, columnHeaders, column);
+    return this.rowsFound;
   }
 }

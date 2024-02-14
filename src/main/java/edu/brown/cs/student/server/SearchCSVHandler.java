@@ -3,6 +3,7 @@ package edu.brown.cs.student.server;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.Searcher.SearchCSV;
+import edu.brown.cs.student.SharedData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +16,11 @@ import spark.Route;
  */
 public class SearchCSVHandler<T> implements Route {
 
-  private List<List<String>> data;
-  private List<String> ch;
 
-  public SearchCSVHandler(List<List<String>> data, List<String> columnHeaders) {
-    this.data = data;
-    this.ch = columnHeaders;
+  private SharedData sd;
+
+  public SearchCSVHandler(SharedData sharedData) {
+    this.sd = sharedData;
   }
 
   @Override
@@ -32,11 +32,13 @@ public class SearchCSVHandler<T> implements Route {
     if (object == null){
       return new ObjectNotFoundResponse(responseMap).serialize();
     }
-    Boolean columnHeaders = !(this.ch.isEmpty());
-    List<List<String>> foundRows = searcherData.startSearcher(this.data, this.ch, object, columnHeaders, column);
-
-    responseMap.put("found rows", foundRows);
-    return new ObjectFoundResponse(responseMap).serialize();
+    Boolean columnHeaders = !(this.sd.getColumnHeaders().isEmpty());
+    List<List<String>> foundRows = searcherData.getRowsFound(sd.getCsvData(), sd.getColumnHeaders(), object, columnHeaders, column);
+    return foundRows.toString();
+//    return null;
+//    responseMap.put("found rows", foundRows);
+//    return sd.getCsvData().toString();
+//    return new ObjectFoundResponse(responseMap).serialize();
   }
 
   public record ObjectFoundResponse(String response_type, Map<String, Object> responseMap) {

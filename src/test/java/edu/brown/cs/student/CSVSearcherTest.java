@@ -35,6 +35,7 @@ public class CSVSearcherTest {
     List<String> starCH = fileReader.getColumnHeaders();
 
     SearchCSV<String> searcherStars = new SearchCSV<>();
+
     // search using column
     assertTrue(searcherStars.startSearcher(starData, starCH, "0", true, "X"));
     // columnHeaders doesn't matter if no column specified

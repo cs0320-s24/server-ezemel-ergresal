@@ -37,8 +37,7 @@ public class Server {
 
     Spark.get("loadcsv", loadCSVHandler);
 
-    Spark.init();
-    Spark.awaitInitialization();
+
 
     List<List<String>> data = loadCSVHandler.getCsvData();
     List<String> columnHeaders = loadCSVHandler.getColumnHeaders();
@@ -46,8 +45,9 @@ public class Server {
     Spark.get("viewcsv",
         new ViewCSVHandler(sharedData));
     Spark.get("searchcsv",
-        new SearchCSVHandler(sharedData.getCsvData(), sharedData.getColumnHeaders()));
-
+        new SearchCSVHandler(sharedData));
+    Spark.init();
+    Spark.awaitInitialization();
     System.out.println("Server started at http://localhost:" + port);
   }
 
