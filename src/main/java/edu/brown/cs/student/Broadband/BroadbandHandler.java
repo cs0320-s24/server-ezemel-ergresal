@@ -187,9 +187,7 @@ public class BroadbandHandler implements Route {
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
       String line;
-      String correctCountyCode = "";
-      reader.readLine();
-//TODO: need to change this to check headers, bc some states have different syntax it seems
+      reader.readLine(); // dont want to parse the first row (headers)
       while ((line = reader.readLine()) != null) {
         String[] parts = line.split(",");
         if (parts.length >= 4) {
