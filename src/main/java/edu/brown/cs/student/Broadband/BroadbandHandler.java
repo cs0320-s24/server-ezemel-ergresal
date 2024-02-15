@@ -87,6 +87,7 @@ public class BroadbandHandler implements Route {
       responseMap.put("place", placeJson);
       return responseMap;
     }
+
 //    catch (Exception e) {
 //      e.printStackTrace();
 //      // This is a relatively unhelpful exception message. An important part of this sprint will be

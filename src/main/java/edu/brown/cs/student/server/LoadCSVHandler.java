@@ -8,6 +8,7 @@ import edu.brown.cs.student.Parser.StringCreatorFromRow;
 import edu.brown.cs.student.SharedData;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +22,10 @@ import spark.Route;
 public class LoadCSVHandler implements Route {
 
   static Map<String, Object> responseMap;
-  private List<List<String>> csvData;
-  private List<String> columnHeaders;
+
   private SharedData sharedData;
 
-  public LoadCSVHandler(SharedData sharedData){
+  public LoadCSVHandler(SharedData sharedData) {
     this.sharedData = sharedData;
   }
 
@@ -41,21 +41,24 @@ public class LoadCSVHandler implements Route {
     }
     String currentPath = new java.io.File(".").getCanonicalPath();
     filename = currentPath + "/data" + filename;
-    responseMap = new HashMap<>();
+    this.responseMap = new HashMap<>();
     ParseCSV<String> fileReader;
     CreatorFromRow<String> myCreator = new StringCreatorFromRow();
     try { //maybe we should make parameter for columnHeaders boolean, with default = 1 or something
       fileReader = new ParseCSV<String>(new FileReader(filename), myCreator, columnHeadersQuery);
     } catch (FileNotFoundException f) {
       return new FileNotFoundResponse().serialize();
+
+    } catch (IOException i) {
+      return "Error with reader closing/parsing file";
     }
     this.sharedData.put(fileReader.getParsedData(), fileReader.getColumnHeaders());
-    this.csvData = fileReader.getParsedData();
-    this.columnHeaders = fileReader.getColumnHeaders();
-    responseMap.put("data", this.csvData);
-    responseMap.put("columnHeaders", this.columnHeaders);
-    return request.queryParams("filename")+" loaded successfully!";
-//    return new FileFoundResponse(responseMap).serialize();
+//    this.csvData = fileReader.getParsedData();
+//    this.columnHeaders = fileReader.getColumnHeaders();
+//    responseMap.put("data", this.csvData);
+//    responseMap.put("columnHeaders", this.columnHeaders);
+//    responseMap.put("data", this.csvData);
+    return request.queryParams("filename") + " loaded successfully!";
   }
 
   /**
@@ -104,16 +107,5 @@ public class LoadCSVHandler implements Route {
     }
   }
 
-  public List<List<String>> getCsvData() {
-    return this.csvData;
-  }
-
-  public List<String> getColumnHeaders() {
-    return this.columnHeaders;
-  }
-
-  public SharedData getSharedData() {
-    return sharedData;
-  }
 }
 

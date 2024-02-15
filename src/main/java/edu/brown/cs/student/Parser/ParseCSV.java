@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class ParseCSV<T> extends Reader {
+
   static final Pattern regexSplitCSVRow =
       Pattern.compile(",(?=([^\\\"]*\\\"[^\\\"]*\\\")*(?![^\\\"]*\\\"))");
   // this regex does not properly get rid of whitespace outside of quotations
@@ -20,36 +21,29 @@ public class ParseCSV<T> extends Reader {
    *
    * @param buffer Destination buffer
    * @param offset Offset at which to start storing characters
-   * @param len Maximum number of characters to read
+   * @param len    Maximum number of characters to read
    * @return
    */
   @Override
-  public int read(char[] buffer, int offset, int len) {
-    try {
-      return reader.read(buffer, offset, len);
-    } catch (IOException io) {
-      System.err.println("Error gathering information from Reader");
-      return -1;
-    }
+  public int read(char[] buffer, int offset, int len) throws IOException {
+    return reader.read(buffer, offset, len);
   }
 
-  /** must implement these two methods in order to extend Reader (read and close) */
+  /**
+   * must implement these two methods in order to extend Reader (read and close)
+   */
   @Override
-  public void close() {
-    try {
-      reader.close();
-    } catch (IOException io) {
-      System.err.println("Error closing Reader");
-    }
+  public void close() throws IOException {
+    reader.close();
   }
 
   /**
    * constructor for ParseCSV
    *
-   * @param reader type of reader to be used (StringReader, FileReader, ...)
+   * @param reader   type of reader to be used (StringReader, FileReader, ...)
    * @param dataType type of data which is going to be parsed, uses the CreatorFromRow for this
    */
-  public ParseCSV(Reader reader, CreatorFromRow<T> dataType, Boolean columnHeaders) {
+  public ParseCSV(Reader reader, CreatorFromRow<T> dataType, Boolean columnHeaders) throws IOException{
     parseData(reader, dataType, columnHeaders);
   }
 
@@ -66,10 +60,10 @@ public class ParseCSV<T> extends Reader {
    * count, we fill 'null' in empty spots. Use CreatorFromRow to sort input string into any
    * designated type
    *
-   * @param reader type of reader to be used (StringReader, FileReader, ...)
+   * @param reader   type of reader to be used (StringReader, FileReader, ...)
    * @param dataType type of data which is going to be parsed, uses the CreatorFromRow for this
    */
-  public void parseData(Reader reader, CreatorFromRow<T> dataType, Boolean columnHeaders) {
+  public void parseData(Reader reader, CreatorFromRow<T> dataType, Boolean columnHeaders) throws IOException{
     int numCols = -1;
     this.parsedData = new ArrayList<>();
     BufferedReader bufferedReader = new BufferedReader(reader);
@@ -119,14 +113,9 @@ public class ParseCSV<T> extends Reader {
           }
         }
       }
-    } catch (IOException | FactoryFailureException io) {
-      System.err.println("Error reading information");
+    } catch (FactoryFailureException io) {
     }
     // Close the readers
-    try {
       bufferedReader.close();
-    } catch (IOException io) {
-      System.err.println("Error closing buffered reader");
-    }
   }
 }

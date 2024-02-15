@@ -10,6 +10,7 @@ public class SearchCSV<T> {
 
   private Set<Integer> rowChecked = new HashSet<>(); // global variable so doesn't change upon recursion
   private List<List<T>> rowsFound;
+  private String response;
 
 
   /**
@@ -46,31 +47,37 @@ public class SearchCSV<T> {
       Object column) {
     rowsFound = new ArrayList<>();
     if (columnHeadersBoolean && columnHeaders.isEmpty()) {
-      System.err.println(
-          "No available column headers. Try searching without column specifier or using index instead.");
+      response =
+          "No available column headers. Try searching without column name or index.";
       return false;
     }
     int columnI = -1;
-    if (column == null){
+    if (column == null) {
       column = -1;
     }
     if (column.equals(-1) || column.equals("")) { // check if input was -1 (nothing specified)
       columnI = -1; // this way we will search each column
     } else {
       try { // try to identify column
+
         columnI = (int) column; // cast to integer from integer (presumably)
         if (columnI < -1
             || columnI >= data.get(0).size()) { // If column number is below -1 or too large, exit
-          System.err.println(
-              "Column "
-                  + columnI
-                  + " doesn't exist"); // User may put either nothing or -1 to search all columns
+          response = "Column " + columnI
+              + " doesn't exist. Available columns are: "+ columnHeaders; // User may put either nothing or -1 to search all columns
           return false;
         }
       } catch (NumberFormatException | ClassCastException e) {
       }
       try {
-        columnI = Integer.parseInt((String) column); // cast to integer from string
+        columnI = Integer.parseInt(column.toString().trim());
+        if (columnI < -1
+            || columnI >= data.get(0).size()) { // If column number is below -1 or too large, exit
+          response = "Column " + columnI
+              + " doesn't exist. Available columns are: "+ columnHeaders; // User may put either nothing or -1 to search all columns
+          return false;
+        }
+        // cast to integer from string
       } catch (NumberFormatException | ClassCastException e) {
         if (columnHeadersBoolean) {
           // If there are column headers, and the indicated column is not an int, this is when we
@@ -84,7 +91,7 @@ public class SearchCSV<T> {
           }
         }
         if (columnI == -1) {
-          System.err.println("Unable to read file column");
+          response = "Unable to find file column, "+column+". Available columns are: "+ columnHeaders;
           return false;
         }
       }
@@ -93,7 +100,7 @@ public class SearchCSV<T> {
     this.rowChecked = new HashSet<>(); // resets rowChecked in case another search call made
 
     if ((found == 0)) {
-      System.err.println("'" + object + "'" + " not found");
+      response = "'" + object + "'" + " not found";
       return false;
     }
     return true;
@@ -115,7 +122,7 @@ public class SearchCSV<T> {
     try {
       numCols = data.get(0).size();
     } catch (IndexOutOfBoundsException e) {
-      System.err.println("Empty dataset. ");
+      response = "Empty dataset. ";
       return numFound;
     }
     if (column == -1) { // we want to search each of the columns if column = -1
@@ -129,7 +136,7 @@ public class SearchCSV<T> {
           try {
             if (data.get(j).get(column).equals(object)) {
               // Perform comparison on objects
-              System.out.println("'" + object + "'" + " found in row " + j + ": " + data.get(j));
+              response = "'" + object + "'" + " found in row " + j + ": " + data.get(j);
               this.rowChecked.add(j);
               this.rowsFound.add(data.get(j));
               numFound++;
@@ -145,8 +152,13 @@ public class SearchCSV<T> {
     return numFound;
   }
 
-  public List<List<T>> getRowsFound(List<List<T>> data, List<T> ch, Object object, Boolean columnHeaders, Object column) {
+  public List<List<T>> getRowsFound(List<List<T>> data, List<T> ch, Object object,
+      Boolean columnHeaders, Object column) {
     startSearcher(data, ch, object, columnHeaders, column);
     return this.rowsFound;
+  }
+
+  public String getResponse() {
+    return this.response;
   }
 }

@@ -34,21 +34,27 @@ public class SearchCSVHandler<T> implements Route {
     String object = request.queryParams("object");
     String column = request.queryParams("column");
     if (object == null){
-      return new ObjectNotFoundResponse(responseMap).serialize();
+      return new ObjectNotFoundResponse("null", responseMap).serialize();
     }
     Boolean columnHeaders = !(this.sd.getColumnHeaders().isEmpty());
     List<List<String>> foundRows = searcherData.getRowsFound(sd.getCsvData(), sd.getColumnHeaders(), object, columnHeaders, column);
     responseMap.put("found rows", foundRows);
+    responseMap.put("response_type", searcherData.getResponse());
     if (foundRows.isEmpty()) {
-      return new ObjectNotFoundResponse(responseMap).serialize();
+      return new ObjectNotFoundResponse(object, responseMap).serialize();
     }
-    return new ObjectFoundResponse(responseMap).serialize();
+    return new ObjectFoundResponse(object, responseMap).serialize();
   }
 
-  public record ObjectFoundResponse(String object_found, Map<String, Object> responseMap) {
-    public ObjectFoundResponse(Map<String, Object> responseMap) {
-      this("Object found", responseMap);
-    }
+//  public record ObjectFoundResponse(String object_found, Map<String, Object> responseMap) {
+//    public ObjectFoundResponse(String searchedObject, Map<String, Object> responseMap) {
+//      this(searchedObject, responseMap);
+//    }
+public record ObjectFoundResponse(String object_found, String searchedObject, Map<String, Object> responseMap) {
+  public ObjectFoundResponse(String searchedObject, Map<String, Object> responseMap) {
+    this(null, searchedObject, responseMap);
+  }
+
 
     /**
      * @return this response, serialized as Json
@@ -73,10 +79,10 @@ public class SearchCSVHandler<T> implements Route {
   /**
    * Response object to send if someone requested soup from an empty Menu
    */
-  public record ObjectNotFoundResponse(String response_type) {
+  public record ObjectNotFoundResponse(String object_not_found, String searchedObject, Map<String, Object> responseMap) {
 
-    public ObjectNotFoundResponse(Map<String, Object> responseMap) {
-      this("Object not found");
+    public ObjectNotFoundResponse(String searchedObject, Map<String, Object> responseMap) {
+      this(null, searchedObject, responseMap);
     }
 
     /**

@@ -38,10 +38,6 @@ public class Server {
 
     Spark.get("loadcsv", loadCSVHandler);
 
-
-
-    List<List<String>> data = loadCSVHandler.getCsvData();
-    List<String> columnHeaders = loadCSVHandler.getColumnHeaders();
     Spark.get("viewcsv",
         new ViewCSVHandler(sharedData));
     Spark.get("searchcsv",
