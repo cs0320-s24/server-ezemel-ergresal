@@ -1,7 +1,5 @@
 package edu.brown.cs.student.Broadband;
 
-//import static java.lang.FdLibm.Cbrt.F;
-
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import edu.brown.cs.student.CSVNotLoadedResponse;
@@ -17,6 +15,7 @@ import java.net.URLConnection;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +38,7 @@ public class BroadbandHandler implements Route {
    * method.
    *
    * <p>NOTE: beware this "return Object" and "throws Exception" idiom. We need to follow it
-   * because
-   * the library uses it, but in general this lowers the protection of the type system.
+   * because the library uses it, but in general this lowers the protection of the type system.
    *
    * @param request  The request object providing information about the HTTP request
    * @param response The response object providing functionality for modifying the response
@@ -60,8 +58,11 @@ public class BroadbandHandler implements Route {
     Map<String, Object> responseMap = new HashMap<>();
     try {
       // Sends a request to the API and receives JSON back
+      LocalDateTime currentDateTime = LocalDateTime.now();
       String placeJson = this.sendRequest(county, state);
-      return placeJson;
+      responseMap.put("date_time", currentDateTime);
+      responseMap.put("place", placeJson);
+      return responseMap;
       // Deserializes JSON into an Activity
 //      return
 //      String county = PlaceAPIUtilities.deserializePlace(countyJson);
@@ -89,7 +90,9 @@ public class BroadbandHandler implements Route {
 //    URL requestURL = new URL("https", "api.census.gov",
 //        http://localhost:3232/broadband?state=36&county=059
 
-    String urlString = String.format("https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:%s&in=state:%s", county, state);
+    String urlString = String.format(
+        "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:%s&in=state:%s",
+        county, state);
     System.out.println(urlString);
     URI requestURI = new URI(urlString);
 
@@ -111,7 +114,6 @@ public class BroadbandHandler implements Route {
     JsonAdapter<List> adapter = moshi.adapter(List.class);
     List<List<String>> responseData = adapter.fromJson(response.body());
 //    BroadbandResponse responseData = adapter.fromJson(response.body());
-
 
     return response.body();
 //    return broadbandResponse.toString();
