@@ -2,11 +2,18 @@ package edu.brown.cs.student.Broadband;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
 import edu.brown.cs.student.CSVNotLoadedResponse;
-import edu.brown.cs.student.Place.Place;
+//import edu.brown.cs.student.Place.Place;
 import edu.brown.cs.student.Place.PlaceAPIUtilities;
+
+import edu.brown.cs.student.Place.StateCode;
+import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,6 +37,7 @@ import spark.Route;
  */
 public class BroadbandHandler implements Route {
 
+  private Map<String, String> stateCodes = new HashMap<>();
 //    state and county query parameters
 
   /**
@@ -44,7 +52,8 @@ public class BroadbandHandler implements Route {
    * @param response The response object providing functionality for modifying the response
    */
   @Override
-  public Object handle(Request request, Response response) {
+  public Object handle(Request request, Response response)
+      throws URISyntaxException, IOException, InterruptedException {
     // If you are interested in how parameters are received, try commenting out and
     // printing these lines! Notice that requesting a specific parameter requires that parameter
     // to be fulfilled.
@@ -56,30 +65,37 @@ public class BroadbandHandler implements Route {
 
     // Creates a hashmap to store the results of the request
     Map<String, Object> responseMap = new HashMap<>();
+    LocalDateTime currentDateTime = LocalDateTime.now();
+
     try {
       // Sends a request to the API and receives JSON back
-      LocalDateTime currentDateTime = LocalDateTime.now();
       String placeJson = this.sendRequest(county, state);
       responseMap.put("date_time", currentDateTime);
+      responseMap.put("county", county);
+      responseMap.put("state", state);
       responseMap.put("place", placeJson);
       return responseMap;
-      // Deserializes JSON into an Activity
-//      return
-//      String county = PlaceAPIUtilities.deserializePlace(countyJson);
-//      // Adds results to the responseMap
-//      responseMap.put("result", "success");
-//      responseMap.put("state", state);
+    } catch (
+        Exception e) { // if county, state are sting names, need to convert them to number codes
+//      county = this.stateCodes.get(county.strip().toLowerCase());
+      if (this.stateCodes.isEmpty()){
+      fillStateCodeMap();}
+      state = this.stateCodes.get(state);
+      String placeJson = this.sendRequest("*", state);
+      responseMap.put("date_time", currentDateTime);
 //      responseMap.put("county", county);
-//      responseMap.put("place", place);
-//      return responseMap;
-    } catch (Exception e) {
-      e.printStackTrace();
-      // This is a relatively unhelpful exception message. An important part of this sprint will be
-      // in learning to debug correctly by creating your own informative error messages where Spark
-      // falls short.
-      responseMap.put("result", e);
+      responseMap.put("state code", state);
+      responseMap.put("place", placeJson);
+      return responseMap;
     }
-    return responseMap;
+//    catch (Exception e) {
+//      e.printStackTrace();
+//      // This is a relatively unhelpful exception message. An important part of this sprint will be
+//      // in learning to debug correctly by creating your own informative error messages where Spark
+//      // falls short.
+//      responseMap.put("result", e);
+//    }
+//    return responseMap;
   }
 
 
@@ -136,5 +152,40 @@ public class BroadbandHandler implements Route {
           "unexpected: API connection not success status " + clientConnection.getResponseMessage());
     }
     return clientConnection;
+  }
+
+  private void fillStateCodeMap() {
+    try {
+
+      URL requestURL = new URL("https://api.census.gov/data/2010/dec/sf1?get=NAME&for=state:*");
+      HttpURLConnection conn = (HttpURLConnection) requestURL.openConnection();
+      conn.setRequestMethod("GET");
+
+      BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String line;
+      StringBuilder response = new StringBuilder();
+
+      while ((line = reader.readLine()) != null) {
+        String[] parts = line.split(",");
+        if (parts.length >= 2) {
+          // Assuming the first part is the state name and the second part is the state code
+          String stateName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");;
+          String stateCode = parts[1].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");;
+          // Add to stateCodes map
+          stateCodes.put(stateName.toLowerCase(), stateCode);
+        }
+      }
+      reader.close();
+    } catch (Exception e) {
+      return;
+    }
+  }
+
+  private String convertCounty(String county) {
+    return null;
+  }
+
+  private String convertState(String state) {
+    return null;
   }
 }
