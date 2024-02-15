@@ -2,12 +2,6 @@ package edu.brown.cs.student.Broadband;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
-import edu.brown.cs.student.CSVNotLoadedResponse;
-//import edu.brown.cs.student.Place.Place;
-import edu.brown.cs.student.Place.PlaceAPIUtilities;
-
-import edu.brown.cs.student.Place.StateCode;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.FileNotFoundException;
@@ -23,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +33,7 @@ import spark.Route;
 public class BroadbandHandler implements Route {
 
   private Map<String, String> stateCodes = new HashMap<>();
+  private List<List<String>> parsedStates = new ArrayList<>(); // list of data for each state weve parsed
 //    state and county query parameters
 
   /**
@@ -78,12 +74,15 @@ public class BroadbandHandler implements Route {
     } catch (
         Exception e) { // if county, state are sting names, need to convert them to number codes
 //      county = this.stateCodes.get(county.strip().toLowerCase());
-      if (this.stateCodes.isEmpty()){
-      fillStateCodeMap();}
+      if (this.stateCodes.isEmpty()) {
+        fillStateCodeMap();
+      }
       state = this.stateCodes.get(state);
-      String placeJson = this.sendRequest("*", state);
+      county = fillAndFindCountyData(state, county);
+
+      String placeJson = this.sendRequest(county, state);
       responseMap.put("date_time", currentDateTime);
-//      responseMap.put("county", county);
+      responseMap.put("county", county);
       responseMap.put("state code", state);
       responseMap.put("place", placeJson);
       return responseMap;
@@ -153,7 +152,6 @@ public class BroadbandHandler implements Route {
     }
     return clientConnection;
   }
-
   private void fillStateCodeMap() {
     try {
 
@@ -180,12 +178,42 @@ public class BroadbandHandler implements Route {
       return;
     }
   }
+  private String fillAndFindCountyData(String stateCode, String county_name) {
+    try {
+      URL requestURL = new URL(
+          "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:"+stateCode);
+      HttpURLConnection conn = (HttpURLConnection) requestURL.openConnection();
+      conn.setRequestMethod("GET");
 
-  private String convertCounty(String county) {
-    return null;
+      BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String line;
+      String correctCountyCode = "";
+      reader.readLine();
+//TODO: need to change this to check headers, bc some states have different syntax it seems
+      while ((line = reader.readLine()) != null) {
+        String[] parts = line.split(",");
+        if (parts.length >= 4) {
+          String countyName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
+          String stateName = parts[1].replaceAll("\"", "").trim();
+          String countyPercentage = parts[2].replaceAll("\"", "").trim();
+          String stateCdoe = parts[3].replaceAll("\"", "").trim();
+
+          String countyCode = parts[4].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
+          parsedStates.add(List.of(countyName, stateName, countyPercentage, stateCode, countyCode));
+          if (countyName.toLowerCase().equals(county_name)){
+//            correctCountyCode = countyCode;
+            reader.close();
+            return countyCode;
+          }
+        }
+      }
+      reader.close();
+      return "";
+    } catch (Exception e) {
+      return "";
+    }
   }
 
-  private String convertState(String state) {
-    return null;
-  }
+//  https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:45
+
 }
