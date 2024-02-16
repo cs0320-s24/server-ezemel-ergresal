@@ -2,7 +2,7 @@ package edu.brown.cs.student.Broadband;
 
 import com.squareup.moshi.Moshi;
 
-public class BroadbandResponse {
+public class BroadbandResponse implements Response {
   private String timeZone;
   private String time;
   private String countyName;
@@ -20,6 +20,7 @@ public class BroadbandResponse {
   /**
    * @return this response, serialized as Json
    */
+  @Override
   public String serialize() {
     Moshi moshi = new Moshi.Builder().build();
     return moshi.adapter(BroadbandResponse.class).toJson(this);
