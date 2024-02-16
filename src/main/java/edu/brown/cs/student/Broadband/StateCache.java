@@ -68,7 +68,7 @@ public class StateCache {
 
       Response result = cache.getUnchecked(new StateCountyPair(stateCode, countyName));
       // For debugging and demo (would remove in a "real" version):
-//      System.out.println(cache.stats());
+      System.out.println(cache.stats());
       return result;
     }
 
