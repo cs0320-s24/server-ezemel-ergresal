@@ -6,8 +6,6 @@ import edu.brown.cs.student.Broadband.BroadbandHandler;
 import edu.brown.cs.student.Broadband.StateCache;
 import edu.brown.cs.student.SharedData;
 import java.util.ArrayList;
-import java.util.List;
-
 import spark.Spark;
 
 /**
@@ -24,8 +22,9 @@ public class Server {
   private SharedData sharedData;
 
   /**
-   * constructor for server class wherein main calls the server, so the sharedData
-   * can act as a field
+   * constructor for server class wherein main calls the server, so the sharedData can act as a
+   * field
+   *
    * @param toUse
    */
   public Server(SharedData toUse) {
@@ -43,11 +42,10 @@ public class Server {
 
     Spark.get("loadcsv", loadCSVHandler);
 
-    Spark.get("viewcsv",
-        new ViewCSVHandler(sharedData));
-    Spark.get("searchcsv",
-        new SearchCSVHandler(sharedData));
-    Spark.get("broadband", new BroadbandHandler(new StateCache()));
+    Spark.get("viewcsv", new ViewCSVHandler(sharedData));
+    Spark.get("searchcsv", new SearchCSVHandler(sharedData));
+//    Spark.get("broadband", new BroadbandHandler(new StateCache()));
+    Spark.get("broadband", new BroadbandHandler(new MockSource()));
     Spark.init();
     Spark.awaitInitialization();
     System.out.println("Server started at http://localhost:" + port);
@@ -55,6 +53,7 @@ public class Server {
 
   /**
    * main method which calls Server so as to inject dependency
+   *
    * @param args
    */
   public static void main(String[] args) {

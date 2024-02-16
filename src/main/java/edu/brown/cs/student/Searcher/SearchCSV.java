@@ -8,10 +8,10 @@ import java.util.Set;
 
 public class SearchCSV<T> {
 
-  private Set<Integer> rowChecked = new HashSet<>(); // global variable so doesn't change upon recursion
+  private Set<Integer> rowChecked =
+      new HashSet<>(); // global variable so doesn't change upon recursion
   private List<List<T>> rowsFound;
   private String response;
-
 
   /**
    * constructor for if column not specified, this means we will search all columns
@@ -29,13 +29,13 @@ public class SearchCSV<T> {
   /**
    * figures out which column should be searched, and then calls search on this column
    *
-   * @param data                 to search through
-   * @param columnHeaders        a list of columnHeaders if columnHeaders is true. Irrelevant if
-   *                             columnHeaders is false
-   * @param object               to be searched for
+   * @param data to search through
+   * @param columnHeaders a list of columnHeaders if columnHeaders is true. Irrelevant if
+   *     columnHeaders is false
+   * @param object to be searched for
    * @param columnHeadersBoolean whether or not the data has a row of columnHeaders. This only stops
-   *                             the
-   * @param column               the column number to search through. -1 if all columns
+   *     the
+   * @param column the column number to search through. -1 if all columns
    * @return whether or not item was found in the specified column
    * @throws IOException
    */
@@ -47,8 +47,7 @@ public class SearchCSV<T> {
       Object column) {
     rowsFound = new ArrayList<>();
     if (columnHeadersBoolean && columnHeaders.isEmpty()) {
-      response =
-          "No available column headers. Try searching without column name or index.";
+      response = "No available column headers. Try searching without column name or index.";
       return false;
     }
     int columnI = -1;
@@ -63,8 +62,11 @@ public class SearchCSV<T> {
         columnI = (int) column; // cast to integer from integer (presumably)
         if (columnI < -1
             || columnI >= data.get(0).size()) { // If column number is below -1 or too large, exit
-          response = "Column " + columnI
-              + " doesn't exist. Available columns are: "+ columnHeaders; // User may put either nothing or -1 to search all columns
+          response =
+              "Column "
+                  + columnI
+                  + " doesn't exist. Available columns are: "
+                  + columnHeaders; // User may put either nothing or -1 to search all columns
           return false;
         }
       } catch (NumberFormatException | ClassCastException e) {
@@ -73,8 +75,11 @@ public class SearchCSV<T> {
         columnI = Integer.parseInt(column.toString().trim());
         if (columnI < -1
             || columnI >= data.get(0).size()) { // If column number is below -1 or too large, exit
-          response = "Column " + columnI
-              + " doesn't exist. Available columns are: "+ columnHeaders; // User may put either nothing or -1 to search all columns
+          response =
+              "Column "
+                  + columnI
+                  + " doesn't exist. Available columns are: "
+                  + columnHeaders; // User may put either nothing or -1 to search all columns
           return false;
         }
         // cast to integer from string
@@ -91,7 +96,8 @@ public class SearchCSV<T> {
           }
         }
         if (columnI == -1) {
-          response = "Unable to find file column, "+column+". Available columns are: "+ columnHeaders;
+          response =
+              "Unable to find file column, " + column + ". Available columns are: " + columnHeaders;
           return false;
         }
       }
@@ -109,11 +115,11 @@ public class SearchCSV<T> {
   /**
    * figures out which column should be searched, and then calls search on this column
    *
-   * @param data     to search through
-   * @param object   to be searched for
-   * @param column   the column number to search through. -1 if all columns
+   * @param data to search through
+   * @param object to be searched for
+   * @param column the column number to search through. -1 if all columns
    * @param numFound number of objects found in data (used for recursion purposees and to print
-   *                 'item not found' afterwards if applicable
+   *     'item not found' afterwards if applicable
    * @return number of objects found in specified column (if -1 column, in total dataset)
    * @throws IOException
    */
@@ -152,8 +158,8 @@ public class SearchCSV<T> {
     return numFound;
   }
 
-  public List<List<T>> getRowsFound(List<List<T>> data, List<T> ch, Object object,
-      Boolean columnHeaders, Object column) {
+  public List<List<T>> getRowsFound(
+      List<List<T>> data, List<T> ch, Object object, Boolean columnHeaders, Object column) {
     startSearcher(data, ch, object, columnHeaders, column);
     return this.rowsFound;
   }
