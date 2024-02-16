@@ -39,16 +39,15 @@ public class StateCache {
      *
      * @param
      */
-    public StateCache(int timeToEvict) {
-//      this.wrappedSearcher = toWrap;
+
+  /**
+   * No parameters: cache will not evict entries.
+   */
+  public StateCache() {
 
       // Look at the docs -- there are lots of builder parameters you can use
       //   including ones that affect garbage-collection (not needed for Server).
       this.cache = CacheBuilder.newBuilder()
-          // How many entries maximum in the cache?
-          .maximumSize(10)
-          // How long should entries remain in the cache?
-          .expireAfterWrite(1, TimeUnit.MINUTES)
           // Keep statistical info around for profiling purposes
           .recordStats()
           .build(
@@ -62,6 +61,57 @@ public class StateCache {
                     }
                   });
     }
+
+  /**
+   * Allows for specifying maximum entries and time to evict after writing. To in essence avoid caching, set maxSize to
+   * 0.
+   * @param maxSize - maximum number of entries in the cache
+   * @param minutesToEvict - time in minutes before an entry is evicted
+   */
+
+  public StateCache(int maxSize, int minutesToEvict) {
+
+      // Look at the docs -- there are lots of builder parameters you can use
+      //   including ones that affect garbage-collection (not needed for Server).
+      this.cache = CacheBuilder.newBuilder()
+              // How many entries maximum in the cache?
+              .maximumSize(maxSize)
+              // How long should entries remain in the cache?
+              .expireAfterWrite(minutesToEvict, TimeUnit.MINUTES)
+              // Keep statistical info around for profiling purposes
+              .recordStats()
+              .build(
+                      // Strategy pattern: how should the cache behave when
+                      // it's asked for something it doesn't have?
+                      new CacheLoader<>() {
+                        @Override
+                        public Response load(StateCountyPair key) throws IOException, IllegalArgumentException {
+                          // If this isn't yet present in the cache, load it:
+                          return searchAPI(key);
+                        }
+                      });
+    }
+
+  public StateCache(int maxSize) {
+
+    // Look at the docs -- there are lots of builder parameters you can use
+    //   including ones that affect garbage-collection (not needed for Server).
+    this.cache = CacheBuilder.newBuilder()
+            // How many entries maximum in the cache?
+            .maximumSize(maxSize)
+            // Keep statistical info around for profiling purposes
+            .recordStats()
+            .build(
+                    // Strategy pattern: how should the cache behave when
+                    // it's asked for something it doesn't have?
+                    new CacheLoader<>() {
+                      @Override
+                      public Response load(StateCountyPair key) throws IOException {
+                        // If this isn't yet present in the cache, load it:
+                        return searchAPI(key);
+                      }
+                    });
+  }
 
     public Response get(String stateCode, String countyName) throws IllegalArgumentException {
       // "get" is designed for concurrent situations; for today, use getUnchecked:
@@ -100,7 +150,7 @@ public class StateCache {
                     countyPercentage);
           }
         }
-      throw new IllegalArgumentException("Invalid county.");
+      throw new IllegalArgumentException();
 //              List.of(countyName, stateName, countyPercentage, stateCode, countyCode));
 //            if (countyName.toLowerCase().equals(county_name)) {
 ////            correctCountyCode = countyCode;

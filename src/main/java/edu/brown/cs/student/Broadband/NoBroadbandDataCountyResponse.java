@@ -1,7 +1,7 @@
 package edu.brown.cs.student.Broadband;
 import com.squareup.moshi.Moshi;
 import java.util.Map;
-public record NoBroadbandDataCountyResponse(String invalid_state, String state, Map<String, Object> responseMap) implements Response {
+public record NoBroadbandDataCountyResponse(String invalid_county, String county, Map<String, Object> responseMap) implements Response {
 
 
     public NoBroadbandDataCountyResponse(String county, Map<String, Object> responseMap) {

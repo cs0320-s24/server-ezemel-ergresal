@@ -24,10 +24,17 @@ public class BroadbandHandler implements Route {
 //   maps state to map of county codes to broadband response
   private StateCache cache;
 
-  public BroadbandHandler(int timeToEvict) {
-    this.cache = new StateCache(timeToEvict);
+  public BroadbandHandler() {
+    this.cache = new StateCache();
   }
 
+  public BroadbandHandler(int maxEntries, int minutesToEvict) {
+    this.cache = new StateCache(maxEntries, minutesToEvict);
+  }
+
+  public BroadbandHandler(int maxEntries) {
+    this.cache = new StateCache(maxEntries);
+  }
 
   /**
    * This handle method needs to be filled by any class implementing Route. When the path set in
@@ -64,105 +71,25 @@ public class BroadbandHandler implements Route {
       if (this.stateCodes.isEmpty()) {
         fillStateCodeMap();
       }
-      state = this.stateCodes.get(state);
-      if (state == null) {
+      if (this.stateCodes.get(state) == null) {
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataStateResponse(state, responseMap);
       }
+      String stateCode = this.stateCodes.get(state);
       if (county.equals("")) {
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataCountyResponse(county, responseMap);
       }
-//      String placeJson = this.sendRequest(county, state);
-//      responseMap.put("date_time", this.parsedStates.get(county).getTime());
-//      responseMap.put("timezone", this.parsedStates.get(county).getTimeZone());
-////      responseMap.put("broadband response", this.parsedStates.get(county));
-//      responseMap.put("county", this.parsedStates.get(county).getCountyName());
-//      responseMap.put("state", this.parsedStates.get(county).getState());
-////      responseMap.put("place", placeJson);
-//      responseMap.put("percentage broadband/high speed internet access",
-//          this.parsedStates.get(county).getPercentageBroadband());
-
-//      responseMap.put("response", this.parsedStates.get(state).get(county).serialize());
-      responseMap.put("response", this.cache.get(state, county).serialize());
+      responseMap.put("response", this.cache.get(stateCode, county).serialize());
       responseMap.put("result", "success");
       return responseMap;
-    } catch(IllegalArgumentException e) {
-      System.out.println(e.getMessage());
-      responseMap.put("result", "error_datasource");
-      return new NoBroadbandDataCountyResponse(county, responseMap);
     } catch (Exception e) {
-      System.out.println(e.getMessage());
       responseMap.put("result", "error_datasource");
       System.out.println(e.getMessage());
-      return new NoBroadbandDataStateResponse(state, responseMap).serialize();
+      return new NoBroadbandDataCountyResponse(county, responseMap).serialize();
     }
-
-//    catch (Exception e) {
-//      e.printStackTrace();
-//      // This is a relatively unhelpful exception message. An important part of this sprint will be
-//      // in learning to debug correctly by creating your own informative error messages where Spark
-//      // falls short.
-//      responseMap.put("result", e);
-//    }
-//    return responseMap;
   }
 
-
-//  private String sendRequest(String county, String state)
-//      throws URISyntaxException, IOException, InterruptedException {
-////    https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&
-////     first neeed to convert county and state into number codes
-////    URL requestURL = new URL("https", "api.census.gov",
-////        http://localhost:3232/broadband?state=36&county=059
-//
-//    String urlString = String.format(
-//        "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:%s&in=state:%s",
-//        county, state);
-//    System.out.println(urlString);
-//    URI requestURI = new URI(urlString);
-//
-//    // Build the HTTP request
-//    HttpRequest request = HttpRequest.newBuilder()
-//        .uri(requestURI)
-//        .GET()
-//        .build();
-//
-//    // Send the HTTP request and store the response
-//    HttpResponse<String> response = HttpClient.newHttpClient()
-//        .send(request, HttpResponse.BodyHandlers.ofString());
-//
-//    System.out.println(response);
-//    System.out.println(response.body());
-//
-//    // deserialize the JSON response if needed
-//    Moshi moshi = new Moshi.Builder().build();
-//    JsonAdapter<List> adapter = moshi.adapter(List.class);
-//    List<List<String>> responseData = adapter.fromJson(response.body());
-////    BroadbandResponse responseData = adapter.fromJson(response.body());
-//
-//    return response.body();
-////    return broadbandResponse.toString();
-//  }
-
-  /**
-   * Private helper method; throws IOException so different callers can handle differently if
-   * needed. //TODO: change filenotfoundexception
-   */
-//  private static HttpURLConnection connect(URL requestURL)
-//      throws FileNotFoundException, IOException {
-//    URLConnection urlConnection = requestURL.openConnection();
-//    if (!(urlConnection instanceof HttpURLConnection)) {
-//      throw new FileNotFoundException("unexpected: result of connection wasn't HTTP");
-//    }
-//    HttpURLConnection clientConnection = (HttpURLConnection) urlConnection;
-//    clientConnection.connect(); // GET
-//    if (clientConnection.getResponseCode() != 200) {
-//      throw new FileNotFoundException(
-//          "unexpected: API connection not success status " + clientConnection.getResponseMessage());
-//    }
-//    return clientConnection;
-//  }
 
   private void fillStateCodeMap() {
     try {
@@ -190,45 +117,4 @@ public class BroadbandHandler implements Route {
     } catch (Exception e) {
     }
   }
-
-  private String fillAndFindCountyData(String stateCode, String county_name) {
-    try {
-      URL requestURL = new URL(
-          "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:"
-              + stateCode);
-      HttpURLConnection conn = (HttpURLConnection) requestURL.openConnection();
-      conn.setRequestMethod("GET");
-
-      BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-      String line;
-      reader.readLine(); // don't want to parse the first row (headers)
-      while ((line = reader.readLine()) != null) {
-        String[] parts = line.split(",");
-        if (parts.length >= 4) {
-          String countyName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-          String stateName = parts[1].replaceAll("\"", "").trim();
-          String countyPercentage = parts[2].replaceAll("\"", "").trim();
-//          String stateCodee = parts[3].replaceAll("\"", "").trim();
-
-          String countyCode = parts[4].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-          parsedStates.get(stateCode).put(countyCode,
-             new BroadbandResponse(LocalDateTime.now().toString(), countyName, stateName,
-                  countyPercentage));
-//              List.of(countyName, stateName, countyPercentage, stateCode, countyCode));
-          if (countyName.toLowerCase().equals(county_name)) {
-//            correctCountyCode = countyCode;
-            reader.close();
-            return countyCode;
-          }
-        }
-      }
-      reader.close();
-      return "";
-    } catch (Exception e) {
-      return "";
-    }
-  }
-
-//  https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:45
-
 }
