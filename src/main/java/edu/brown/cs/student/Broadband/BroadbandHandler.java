@@ -1,22 +1,13 @@
 package edu.brown.cs.student.Broadband;
 
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import spark.Request;
 import spark.Response;
@@ -57,8 +48,9 @@ public class BroadbandHandler implements Route {
     // to be fulfilled.
     // If you specify a queryParam, you can access it by appending ?parameterName=name to the
     // endpoint
-//    Set<String> params = request.queryParams();
     Map<String, Object> responseMap = new HashMap<>();
+    // Creates a hashmap to store the results of the request
+
     if (request.queryParams().isEmpty() || !request.queryParams().contains("county")
             || !request.queryParams().contains("state")) {
       responseMap.put("current_params", request.queryParams());
@@ -68,42 +60,15 @@ public class BroadbandHandler implements Route {
     String county = request.queryParams("county").toLowerCase();
     String state = request.queryParams("state").toLowerCase();
 
-    // Creates a hashmap to store the results of the request
-
-//    LocalDateTime currentDateTime = LocalDateTime.now();
-
     try {
-      // Sends a request to the API and receives JSON back
-//      String placeJson = this.sendRequest(county, state);
-////      responseMap.put("date_time", currentDateTime);
-////      responseMap.put("county", county);
-////      responseMap.put("state", state);
-////      responseMap.put("place", placeJson);
-//
-////      responseMap.put("date_time", this.parsedStates.get(county).getTime());
-//////      responseMap.put("broadband response", this.parsedStates.get(county));
-////      responseMap.put("county", this.parsedStates.get(county).getCountyName());
-////      responseMap.put("state", this.parsedStates.get(county).getState());
-//////      responseMap.put("place", placeJson);
-////      responseMap.put("percentage broadband/high speed internet access",
-////          this.parsedStates.get(county).getPercentageBroadband());
-//
-//      return placeJson;
-//    } catch (
-//        Exception e) { // if county, state are sting names, need to convert them to number codes
-//      county = this.stateCodes.get(county.strip().toLowerCase());
       if (this.stateCodes.isEmpty()) {
         fillStateCodeMap();
       }
       state = this.stateCodes.get(state);
-
-//      responseMap.put("state", state);
       if (state == null) {
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataStateResponse(state, responseMap);
       }
-//      county = fillAndFindCountyData(state, county);
-//      responseMap.put("county", county);
       if (county.equals("")) {
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataCountyResponse(county, responseMap);

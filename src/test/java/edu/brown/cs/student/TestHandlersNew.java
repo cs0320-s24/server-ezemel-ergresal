@@ -1,7 +1,5 @@
 package edu.brown.cs.student;
-
 import static org.testng.AssertJUnit.assertEquals;
-
 import edu.brown.cs.student.Broadband.BroadbandHandler;
 import edu.brown.cs.student.server.LoadCSVHandler;
 import edu.brown.cs.student.server.SearchCSVHandler;
@@ -20,6 +18,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import spark.Spark;
+//import edu.brown.cs32.nwsapi.datasource.mocks.MockedNWSAPISource;
+
 
 public class TestHandlersNew {
 private SharedData sharedData;
@@ -33,6 +33,8 @@ private static int port = 2222;
   @BeforeEach
   public void setup() {
     // Re-initialize state, etc. for _every_ test method run
+//    this.sharedData = mock something
+
     this.sharedData = new SharedData(new ArrayList<>(), new ArrayList<>());
 
     LoadCSVHandler loadCSVHandler = new LoadCSVHandler(sharedData);
@@ -117,9 +119,15 @@ private static int port = 2222;
     tryRequest(
         "loadcsv?filename=/stars/ten-star.csv&columnheaders=true");
 // viewing csv
-    HttpURLConnection clientConnectionNoFile = tryRequest(
+    HttpURLConnection clientConnectionFile = tryRequest(
         "viewcsv");
-    assertEquals(200, clientConnectionNoFile.getResponseCode());
+    assertEquals(200, clientConnectionFile.getResponseCode());
+    InputStream inputStream = clientConnectionFile.getInputStream();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+    String output = reader.readLine();
+    reader.close();
+    inputStream.close();
+    assertEquals(output, "/stars/ten-star.csv loaded successfully!");
 }
   @Test
   public void testSearchHandler() throws IOException {
