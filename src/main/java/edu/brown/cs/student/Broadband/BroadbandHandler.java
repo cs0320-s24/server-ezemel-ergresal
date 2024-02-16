@@ -57,9 +57,9 @@ public class BroadbandHandler implements Route {
     String state = request.queryParams("state");
     if (request.queryParams().isEmpty() || !request.queryParams().contains("county")
         || !request.queryParams().contains("state")) {
-      request.queryParams().add("error_datasource");
-      return new IncorrectParametersResponse("Required parameters: county, state",
-          request.queryParams());
+      responseMap.put("current_params", request.queryParams());
+      responseMap.put("result", "error_bad_request");
+      return new IncorrectParametersResponse("Required parameters: county, state", responseMap);
     }
 
     // Creates a hashmap to store the results of the request

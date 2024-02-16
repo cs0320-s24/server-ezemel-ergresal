@@ -26,10 +26,12 @@ private SharedData sd;
   public Object handle(Request request, Response response) throws Exception {
     Map<String, Object> responseMap = new HashMap<>();
     if(this.sd.isEmpty()) {
+      responseMap.put("response", "error_viewing");
       return new CSVNotLoadedResponse(responseMap).serialize();
     }
 //    responseMap.put("data", this.data);
 //    responseMap.put("columnHeaders", this.ch);
+    responseMap.put("response", "success");
     return new ParsedData(sd.getColumnHeaders(), sd.getCsvData()).serialize();
   }
 
