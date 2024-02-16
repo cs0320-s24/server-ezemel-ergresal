@@ -44,7 +44,8 @@ public class Server {
 
     Spark.get("viewcsv", new ViewCSVHandler(sharedData));
     Spark.get("searchcsv", new SearchCSVHandler(sharedData));
-    Spark.get("broadband", new BroadbandHandler(new StateCache()));
+//    Spark.get("broadband", new BroadbandHandler(new StateCache()));
+    Spark.get("broadband", new BroadbandHandler(new MockSource()));
     Spark.init();
     Spark.awaitInitialization();
     System.out.println("Server started at http://localhost:" + port);

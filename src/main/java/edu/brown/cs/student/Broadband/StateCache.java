@@ -191,9 +191,9 @@ public class StateCache implements Datasource {
         if (parts.length >= 2) {
           // Assuming the first part is the state name and the second part is the state code
           String stateName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-          ;
+
           String stateCode = parts[1].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-          ;
+
           // Add to stateCodes map
           //                    parsedStates.put(stateCode, new HashMap<>());
           this.stateCodes.put(stateName.toLowerCase(), stateCode);
