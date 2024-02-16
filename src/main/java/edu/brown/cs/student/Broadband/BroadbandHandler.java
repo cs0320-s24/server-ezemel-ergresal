@@ -102,13 +102,12 @@ public class BroadbandHandler implements Route {
       if (this.stateCodes.isEmpty()) {
         fillStateCodeMap();
       }
-      state = this.stateCodes.get(state);
-
 //      responseMap.put("state", state);
-      if (state == null) {
+      if (this.stateCodes.get(state) == null) {
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataStateResponse(state, responseMap);
       }
+      String stateCode = this.stateCodes.get(state);
 //      county = fillAndFindCountyData(state, county);
 //      responseMap.put("county", county);
       if (county.equals("")) {
@@ -126,18 +125,13 @@ public class BroadbandHandler implements Route {
 //          this.parsedStates.get(county).getPercentageBroadband());
 
 //      responseMap.put("response", this.parsedStates.get(state).get(county).serialize());
-      responseMap.put("response", this.cache.get(state, county).serialize());
+      responseMap.put("response", this.cache.get(stateCode, county).serialize());
       responseMap.put("result", "success");
       return responseMap;
-    } catch(IllegalArgumentException e) {
-      System.out.println(e.getMessage());
-      responseMap.put("result", "error_datasource");
-      return new NoBroadbandDataCountyResponse(county, responseMap);
     } catch (Exception e) {
-      System.out.println(e.getMessage());
       responseMap.put("result", "error_datasource");
       System.out.println(e.getMessage());
-      return new NoBroadbandDataStateResponse(state, responseMap).serialize();
+      return new NoBroadbandDataCountyResponse(county, responseMap).serialize();
     }
 
 //    catch (Exception e) {

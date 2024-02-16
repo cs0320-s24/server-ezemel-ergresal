@@ -85,7 +85,7 @@ public class StateCache {
                       // it's asked for something it doesn't have?
                       new CacheLoader<>() {
                         @Override
-                        public Response load(StateCountyPair key) throws IOException {
+                        public Response load(StateCountyPair key) throws IOException, IllegalArgumentException {
                           // If this isn't yet present in the cache, load it:
                           return searchAPI(key);
                         }
@@ -150,7 +150,7 @@ public class StateCache {
                     countyPercentage);
           }
         }
-      throw new IllegalArgumentException("Invalid county.");
+      throw new IllegalArgumentException();
 //              List.of(countyName, stateName, countyPercentage, stateCode, countyCode));
 //            if (countyName.toLowerCase().equals(county_name)) {
 ////            correctCountyCode = countyCode;
