@@ -5,7 +5,7 @@ public record NoBroadbandDataCountyResponse(String invalid_county, String county
 
 
     public NoBroadbandDataCountyResponse(String county, Map<String, Object> responseMap) {
-      this("County not found", county, responseMap);
+      this("county not found", county, responseMap);
     }
 
     /**

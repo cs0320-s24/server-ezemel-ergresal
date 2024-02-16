@@ -10,7 +10,7 @@ import java.util.Map;
 
 
     public NoBroadbandDataStateResponse(String state, Map<String, Object> responseMap) {
-      this("State not found", state, responseMap);
+      this("state not found", state, responseMap);
     }
 
     /**
