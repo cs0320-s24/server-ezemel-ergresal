@@ -151,27 +151,7 @@ public class StateCache {
           }
         }
       throw new IllegalArgumentException();
-//              List.of(countyName, stateName, countyPercentage, stateCode, countyCode));
-//            if (countyName.toLowerCase().equals(county_name)) {
-////            correctCountyCode = countyCode;
-//
-//              return countyCode;
-//            }
-////          }
-//
-////        }
-//        reader.close();
-//        throw new IllegalArgumentException("aahahahahahahahah");
     }
-
-    // This would have been a more direct way to start on building a proxy
-    //  (but I like using Guava's cache)
-    /*
-    public Collection<String> search(String target) {
-        // Pass through: call the wrapped object
-        return this.wrappedSearcher.searchLines(target);
-    }
-     */
 }
 
 

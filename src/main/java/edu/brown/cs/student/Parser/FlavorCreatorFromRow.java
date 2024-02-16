@@ -1,7 +1,5 @@
 package edu.brown.cs.student.Parser;
 
-import edu.brown.cs.student.Flavor;
-import edu.brown.cs.student.IceCream;
 import java.util.List;
 
 /** A class used for turning csv of string into arrays of flavors */
