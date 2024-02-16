@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import spark.Request;
@@ -19,22 +18,23 @@ import spark.Route;
  */
 public class BroadbandHandler implements Route {
 
-  private Map<String, String> stateCodes = new HashMap<>();
-  private Map<String, Map<String, BroadbandResponse>> parsedStates = new HashMap<>(); // list of data for each state weve parsed
+
+//  private Map<String, Map<String, BroadbandResponse>> parsedStates = new HashMap<>(); // list of data for each state weve parsed
 //   maps state to map of county codes to broadband response
-  private StateCache cache;
+  private Datasource source;
 
-  public BroadbandHandler() {
-    this.cache = new StateCache();
+  public BroadbandHandler(Datasource source) {
+    this.source = source;
+//            new StateCache();
   }
 
-  public BroadbandHandler(int maxEntries, int minutesToEvict) {
-    this.cache = new StateCache(maxEntries, minutesToEvict);
-  }
-
-  public BroadbandHandler(int maxEntries) {
-    this.cache = new StateCache(maxEntries);
-  }
+//  public BroadbandHandler(int maxEntries, int minutesToEvict) {
+//    this.source = new StateCache(maxEntries, minutesToEvict);
+//  }
+//
+//  public BroadbandHandler(int maxEntries) {
+//    this.source = new StateCache(maxEntries);
+//  }
 
   /**
    * This handle method needs to be filled by any class implementing Route. When the path set in
@@ -67,54 +67,30 @@ public class BroadbandHandler implements Route {
     String county = request.queryParams("county").toLowerCase();
     String state = request.queryParams("state").toLowerCase();
 
-    try {
-      if (this.stateCodes.isEmpty()) {
-        fillStateCodeMap();
-      }
-      if (this.stateCodes.get(state) == null) {
-        responseMap.put("result", "error_datasource");
-        return new NoBroadbandDataStateResponse(state, responseMap);
-      }
-      String stateCode = this.stateCodes.get(state);
-      if (county.equals("")) {
-        responseMap.put("result", "error_datasource");
-        return new NoBroadbandDataCountyResponse(county, responseMap);
-      }
-      responseMap.put("response", this.cache.get(stateCode, county).serialize());
-      responseMap.put("result", "success");
-      return responseMap;
-    } catch (Exception e) {
-      responseMap.put("result", "error_datasource");
-      System.out.println(e.getMessage());
-      return new NoBroadbandDataCountyResponse(county, responseMap).serialize();
-    }
+//    try {
+//      if (this.stateCodes.isEmpty()) {
+//        fillStateCodeMap();
+//      }
+//      if (this.stateCodes.get(state) == null) {
+//        responseMap.put("result", "error_datasource");
+//        return new NoBroadbandDataStateResponse(state, responseMap);
+//      }
+//      String stateCode = this.stateCodes.get(state);
+//      if (county.equals("")) {
+//        responseMap.put("result", "error_datasource");
+//        return new NoBroadbandDataCountyResponse(county, responseMap);
+//      }
+      return this.source.query(state, county, responseMap);
+      //responseMap.put("response", this.source.query(state, county).serialize());
+//      responseMap.put("result", "success");
+//      return responseMap;
+//    } catch (Exception e) {
+//      responseMap.put("result", "error_datasource");
+////      System.out.println(e.getMessage());
+//      return new NoBroadbandDataCountyResponse(county, responseMap).serialize();
+//    }
   }
 
 
-  private void fillStateCodeMap() {
-    try {
 
-      URL requestURL = new URL("https://api.census.gov/data/2010/dec/sf1?get=NAME&for=state:*");
-      HttpURLConnection conn = (HttpURLConnection) requestURL.openConnection();
-      conn.setRequestMethod("GET");
-
-      BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        String[] parts = line.split(",");
-        if (parts.length >= 2) {
-          // Assuming the first part is the state name and the second part is the state code
-          String stateName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-          ;
-          String stateCode = parts[1].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-          ;
-          // Add to stateCodes map
-          parsedStates.put(stateCode, new HashMap<>());
-          stateCodes.put(stateName.toLowerCase(), stateCode);
-        }
-      }
-      reader.close();
-    } catch (Exception e) {
-    }
-  }
 }

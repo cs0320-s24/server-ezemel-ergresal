@@ -3,6 +3,7 @@ package edu.brown.cs.student;
 import static org.testng.AssertJUnit.assertEquals;
 
 import edu.brown.cs.student.Broadband.BroadbandHandler;
+import edu.brown.cs.student.Broadband.StateCache;
 import edu.brown.cs.student.server.LoadCSVHandler;
 import edu.brown.cs.student.server.SearchCSVHandler;
 import edu.brown.cs.student.server.Server;
@@ -49,7 +50,7 @@ public class TestHandlersNew {
         new ViewCSVHandler(sharedData));
     Spark.get("searchcsv",
         new SearchCSVHandler(sharedData));
-    Spark.get("broadband", new BroadbandHandler());
+    Spark.get("broadband", new BroadbandHandler(new StateCache()));
     Spark.init();
     Spark.awaitInitialization();
   }
