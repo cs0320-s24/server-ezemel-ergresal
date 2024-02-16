@@ -59,18 +59,18 @@ public class BroadbandHandler implements Route {
     // endpoint
 //    Set<String> params = request.queryParams();
     Map<String, Object> responseMap = new HashMap<>();
-    String county = request.queryParams("county").toLowerCase();
-    String state = request.queryParams("state").toLowerCase();
     if (request.queryParams().isEmpty() || !request.queryParams().contains("county")
-        || !request.queryParams().contains("state")) {
+            || !request.queryParams().contains("state")) {
       responseMap.put("current_params", request.queryParams());
       responseMap.put("result", "error_bad_request");
       return new IncorrectParametersResponse("Required parameters: county, state", responseMap);
     }
+    String county = request.queryParams("county").toLowerCase();
+    String state = request.queryParams("state").toLowerCase();
 
     // Creates a hashmap to store the results of the request
 
-    LocalDateTime currentDateTime = LocalDateTime.now();
+//    LocalDateTime currentDateTime = LocalDateTime.now();
 
     try {
       // Sends a request to the API and receives JSON back
@@ -123,9 +123,11 @@ public class BroadbandHandler implements Route {
       responseMap.put("result", "success");
       return responseMap;
     } catch(IllegalArgumentException e) {
+      System.out.println(e.getMessage());
       responseMap.put("result", "error_datasource");
       return new NoBroadbandDataCountyResponse(county, responseMap);
     } catch (Exception e) {
+      System.out.println(e.getMessage());
       responseMap.put("result", "error_datasource");
       System.out.println(e.getMessage());
       return new NoBroadbandDataStateResponse(state, responseMap).serialize();
