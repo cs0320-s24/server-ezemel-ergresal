@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import spark.Request;
@@ -16,6 +15,17 @@ import spark.Route;
 /**
  * sends back the broadband data from the ACS Census Data API key : key:
  * 51d2ea8997215acdf626ff79e2cb74c9bc4a56cc
+ *
+ * parameters: state and county... Broadband will error with the correct error response if an incorrect
+ * - county or state is inputted into either of these fields.
+ * - The way this function works is by first creating a map of state names to state codes. This allows
+ * - the method to parse the statename parameter into a stsatecode to be input into the API of
+ * - census data.
+ *   - Then, using a caching algorithm, the county queries are parsed. Since there are so many
+ *   - counties in the country, this helps repeat searches be more time efficient. There are also
+ *   - fields in this caching algorithm wherein a developer may specify the
+ *   - maxSize, which is the maximum number of entries in the cache
+ *     and minutesToEvict - time in minutes before an entry is evicted
  */
 public class BroadbandHandler implements Route {
 

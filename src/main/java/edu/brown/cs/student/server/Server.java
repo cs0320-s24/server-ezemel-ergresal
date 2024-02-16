@@ -23,6 +23,11 @@ public class Server {
 
   private SharedData sharedData;
 
+  /**
+   * constructor for server class wherein main calls the server, so the sharedData
+   * can act as a field
+   * @param toUse
+   */
   public Server(SharedData toUse) {
     this.sharedData = toUse;
 
@@ -48,6 +53,10 @@ public class Server {
     System.out.println("Server started at http://localhost:" + port);
   }
 
+  /**
+   * main method which calls Server so as to inject dependency
+   * @param args
+   */
   public static void main(String[] args) {
     Server server = new Server(new SharedData(new ArrayList<>(), new ArrayList<>()));
     // Notice that this runs, but the program continues executing. Why

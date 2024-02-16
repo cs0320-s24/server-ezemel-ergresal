@@ -25,10 +25,26 @@ public class LoadCSVHandler implements Route {
 
   private SharedData sharedData;
 
+  /**
+   * this handler is used to load csv handler from a given filename.
+   * The user must input a query 'filename', which is the filename as it is found
+   * after the data package found in the current directory.
+   * If the filename is valid, the CSVParse class parses the data, and puts it into
+   * the sharedData. Then, if all works out, a message tells the user this was successful
+   * @param sharedData a shared state which uses data injection to carry
+   *                   data across class and handlers
+   */
   public LoadCSVHandler(SharedData sharedData) {
     this.sharedData = sharedData;
   }
 
+  /**
+   * handle method for loadcsv, see above for particulars.
+   * @param request
+   * @param response
+   * @return
+   * @throws Exception
+   */
   @Override
   public Object handle(Request request, Response response) throws Exception {
     this.responseMap = new HashMap<>();
@@ -57,11 +73,7 @@ public class LoadCSVHandler implements Route {
       return "Error with reader closing/parsing file: "+ filename;
     }
     this.sharedData.put(fileReader.getParsedData(), fileReader.getColumnHeaders());
-//    this.csvData = fileReader.getParsedData();
-//    this.columnHeaders = fileReader.getColumnHeaders();
-//    responseMap.put("data", this.csvData);
-//    responseMap.put("columnHeaders", this.columnHeaders);
-//    responseMap.put("data", this.csvData);
+
     return request.queryParams("filename") + " loaded successfully!";
   }
 

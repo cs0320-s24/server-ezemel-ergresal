@@ -40,7 +40,7 @@ public class TestHandlersNew {
 //    this.sharedData = mock something
   }
   public void startServer(SharedData sd){
-    this.sharedData = new SharedData(new ArrayList<>(), new ArrayList<>());
+    this.sharedData = sd;
 
     LoadCSVHandler loadCSVHandler = new LoadCSVHandler(sharedData);
 

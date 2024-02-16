@@ -13,7 +13,12 @@ import spark.Response;
 import spark.Route;
 
 /**
- * Handler for loading the csv. Simply loads data content into
+ * Handler for searching the csv.
+ * parameters: object, the object which will be searched in the file
+ * - column: if the columnheaders field is listed as true, then this column will be parsed to
+ * - find the data object provided. This may be either a column index or a column object name.
+ * -  This will fail with the correct error
+ * - message if there is no CSV data loaded into the sharedData.
  */
 public class SearchCSVHandler<T> implements Route {
 
@@ -46,11 +51,13 @@ public class SearchCSVHandler<T> implements Route {
     return new ObjectFoundResponse(object, responseMap).serialize();
   }
 
-//  public record ObjectFoundResponse(String object_found, Map<String, Object> responseMap) {
-//    public ObjectFoundResponse(String searchedObject, Map<String, Object> responseMap) {
-//      this(searchedObject, responseMap);
-//    }
-public record ObjectFoundResponse(String object_found, String searchedObject, Map<String, Object> responseMap) {
+  /**
+   * This response is returned when the searched object is found in the dataset
+   * @param object_found
+   * @param searchedObject
+   * @param responseMap
+   */
+  public record ObjectFoundResponse(String object_found, String searchedObject, Map<String, Object> responseMap) {
   public ObjectFoundResponse(String searchedObject, Map<String, Object> responseMap) {
     this(null, searchedObject, responseMap);
   }
