@@ -1,15 +1,27 @@
 package edu.brown.cs.student.Broadband;
 
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
+import com.squareup.moshi.Moshi;
 
 public class BroadbandResponse {
-//  private LocalDateTime dateTime;
   private String timeZone;
-  //add fields for the actual info: "the state and county names your server received", list<list<string>> (?)
+  private String time;
+  private String countyName;
+  private String state;
+  private String percentageBroadband;
 
-  public BroadbandResponse() {
-//    this.dateTime = LocalDateTime.now();
+  public BroadbandResponse(String time, String countyName, String state, String percentageBroadband) {
     this.timeZone = "EST";
+    this.time = time;
+    this.countyName = countyName;
+    this.state = state;
+    this.percentageBroadband = percentageBroadband;
+  }
+
+  /**
+   * @return this response, serialized as Json
+   */
+  public String serialize() {
+    Moshi moshi = new Moshi.Builder().build();
+    return moshi.adapter(BroadbandResponse.class).toJson(this);
   }
 }

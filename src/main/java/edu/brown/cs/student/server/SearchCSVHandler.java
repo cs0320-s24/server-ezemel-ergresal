@@ -94,23 +94,4 @@ public record ObjectFoundResponse(String object_found, String searchedObject, Ma
     }
   }
 
-//  /**
-//   * Response object to send if no csv loaded
-//   */
-//  public record CSVNotLoadedResponse(String error_retrieving_data) {
-//
-//    public CSVNotLoadedResponse(Map<String, Object> responseMap) {
-//      this("No CSV data loaded.");
-//    }
-//
-//    /**
-//     * @return this response, serialized as Json
-//     */
-//    String serialize() {
-//      Moshi moshi = new Moshi.Builder().build();
-//      return moshi.adapter(SearchCSVHandler.CSVNotLoadedResponse.class).toJson(this);
-//    }
-//  }
-
-
 }

@@ -3,11 +3,9 @@ package edu.brown.cs.student.Broadband;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,24 +15,22 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
 /**
- * sends back the broadband data from the ACS Census Data API key :
+ * sends back the broadband data from the ACS Census Data API key : key:
  * 51d2ea8997215acdf626ff79e2cb74c9bc4a56cc
  */
 public class BroadbandHandler implements Route {
 
   private Map<String, String> stateCodes = new HashMap<>();
-  private List<List<String>> parsedStates = new ArrayList<>(); // list of data for each state weve parsed
-//    state and county query parameters
+  private Map<String, Map<String, BroadbandResponse>> parsedStates = new HashMap<>(); // list of data for each state weve parsed
+//   maps state to map of county codes to broadband response
 
   /**
    * This handle method needs to be filled by any class implementing Route. When the path set in
@@ -56,36 +52,72 @@ public class BroadbandHandler implements Route {
     // If you specify a queryParam, you can access it by appending ?parameterName=name to the
     // endpoint
 //    Set<String> params = request.queryParams();
+    Map<String, Object> responseMap = new HashMap<>();
     String county = request.queryParams("county");
     String state = request.queryParams("state");
+    if (request.queryParams().isEmpty() || !request.queryParams().contains("county")
+        || !request.queryParams().contains("state")) {
+      request.queryParams().add("error_datasource");
+      return new IncorrectParametersResponse("Required parameters: county, state",
+          request.queryParams());
+    }
 
     // Creates a hashmap to store the results of the request
-    Map<String, Object> responseMap = new HashMap<>();
+
     LocalDateTime currentDateTime = LocalDateTime.now();
 
     try {
       // Sends a request to the API and receives JSON back
-      String placeJson = this.sendRequest(county, state);
-      responseMap.put("date_time", currentDateTime);
-      responseMap.put("county", county);
-      responseMap.put("state", state);
-      responseMap.put("place", placeJson);
-      return responseMap;
-    } catch (
-        Exception e) { // if county, state are sting names, need to convert them to number codes
+//      String placeJson = this.sendRequest(county, state);
+////      responseMap.put("date_time", currentDateTime);
+////      responseMap.put("county", county);
+////      responseMap.put("state", state);
+////      responseMap.put("place", placeJson);
+//
+////      responseMap.put("date_time", this.parsedStates.get(county).getTime());
+//////      responseMap.put("broadband response", this.parsedStates.get(county));
+////      responseMap.put("county", this.parsedStates.get(county).getCountyName());
+////      responseMap.put("state", this.parsedStates.get(county).getState());
+//////      responseMap.put("place", placeJson);
+////      responseMap.put("percentage broadband/high speed internet access",
+////          this.parsedStates.get(county).getPercentageBroadband());
+//
+//      return placeJson;
+//    } catch (
+//        Exception e) { // if county, state are sting names, need to convert them to number codes
 //      county = this.stateCodes.get(county.strip().toLowerCase());
       if (this.stateCodes.isEmpty()) {
         fillStateCodeMap();
       }
       state = this.stateCodes.get(state);
-      county = fillAndFindCountyData(state, county);
 
-      String placeJson = this.sendRequest(county, state);
-      responseMap.put("date_time", currentDateTime);
+      responseMap.put("state", state);
+      if (state == null) {
+        responseMap.put("result", "error_datasource");
+        return new NoBroadbandDataStateResponse(state, responseMap);
+      }
+      county = fillAndFindCountyData(state, county);
       responseMap.put("county", county);
-      responseMap.put("state code", state);
-      responseMap.put("place", placeJson);
+      if (county.equals("")) {
+        responseMap.put("result", "error_datasource");
+        return new NoBroadbandDataCountyResponse(county, responseMap);
+      }
+//      String placeJson = this.sendRequest(county, state);
+//      responseMap.put("date_time", this.parsedStates.get(county).getTime());
+//      responseMap.put("timezone", this.parsedStates.get(county).getTimeZone());
+////      responseMap.put("broadband response", this.parsedStates.get(county));
+//      responseMap.put("county", this.parsedStates.get(county).getCountyName());
+//      responseMap.put("state", this.parsedStates.get(county).getState());
+////      responseMap.put("place", placeJson);
+//      responseMap.put("percentage broadband/high speed internet access",
+//          this.parsedStates.get(county).getPercentageBroadband());
+
+      responseMap.put("response", this.parsedStates.get(state).get(county).serialize());
+      responseMap.put("result", "success");
       return responseMap;
+    } catch (Exception e) {
+      responseMap.put("result", "error_datasource");
+      return new NoBroadbandDataStateResponse(state, responseMap).serialize();
     }
 
 //    catch (Exception e) {
@@ -153,6 +185,7 @@ public class BroadbandHandler implements Route {
     }
     return clientConnection;
   }
+
   private void fillStateCodeMap() {
     try {
 
@@ -162,44 +195,49 @@ public class BroadbandHandler implements Route {
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
       String line;
-      StringBuilder response = new StringBuilder();
-
       while ((line = reader.readLine()) != null) {
         String[] parts = line.split(",");
         if (parts.length >= 2) {
           // Assuming the first part is the state name and the second part is the state code
-          String stateName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");;
-          String stateCode = parts[1].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");;
+          String stateName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
+          ;
+          String stateCode = parts[1].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
+          ;
           // Add to stateCodes map
+          parsedStates.put(stateCode, new HashMap<>());
           stateCodes.put(stateName.toLowerCase(), stateCode);
         }
       }
       reader.close();
     } catch (Exception e) {
-      return;
     }
   }
+
   private String fillAndFindCountyData(String stateCode, String county_name) {
     try {
       URL requestURL = new URL(
-          "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:"+stateCode);
+          "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:*&in=state:"
+              + stateCode);
       HttpURLConnection conn = (HttpURLConnection) requestURL.openConnection();
       conn.setRequestMethod("GET");
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
       String line;
-      reader.readLine(); // dont want to parse the first row (headers)
+      reader.readLine(); // don't want to parse the first row (headers)
       while ((line = reader.readLine()) != null) {
         String[] parts = line.split(",");
         if (parts.length >= 4) {
           String countyName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
           String stateName = parts[1].replaceAll("\"", "").trim();
           String countyPercentage = parts[2].replaceAll("\"", "").trim();
-          String stateCdoe = parts[3].replaceAll("\"", "").trim();
+//          String stateCodee = parts[3].replaceAll("\"", "").trim();
 
           String countyCode = parts[4].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-          parsedStates.add(List.of(countyName, stateName, countyPercentage, stateCode, countyCode));
-          if (countyName.toLowerCase().equals(county_name)){
+          parsedStates.get(stateCode).put(countyCode,
+             new BroadbandResponse(LocalDateTime.now().toString(), countyName, stateName,
+                  countyPercentage));
+//              List.of(countyName, stateName, countyPercentage, stateCode, countyCode));
+          if (countyName.toLowerCase().equals(county_name)) {
 //            correctCountyCode = countyCode;
             reader.close();
             return countyCode;
