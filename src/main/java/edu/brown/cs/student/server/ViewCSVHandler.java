@@ -12,23 +12,23 @@ import spark.Response;
 import spark.Route;
 
 /**
- * Handler for viewing the csv.
- * - parameters: there are no parameters for this function. This will fail with the correct error
- * - message if there is no CSV data loaded into the sharedData.
- * - This handler will return a json object in the server webpage which includes a data object (
- * a list of list, which are essentially a list of rows, wherein each row has parsed data separated
- * - by commas, as is parsed in the loadcsv handler)
+ * Handler for viewing the csv. - parameters: there are no parameters for this function. This will
+ * fail with the correct error - message if there is no CSV data loaded into the sharedData. - This
+ * handler will return a json object in the server webpage which includes a data object ( a list of
+ * list, which are essentially a list of rows, wherein each row has parsed data separated - by
+ * commas, as is parsed in the loadcsv handler)
  */
 public class ViewCSVHandler implements Route {
 
+  private SharedData sd;
 
-private SharedData sd;
   public ViewCSVHandler(SharedData sharedData) {
     this.sd = sharedData;
   }
 
   /**
    * Handle method used to take care of calls to viewcsv, see above comment for particulars
+   *
    * @param request
    * @param response
    * @return
@@ -37,7 +37,7 @@ private SharedData sd;
   @Override
   public Object handle(Request request, Response response) throws Exception {
     Map<String, Object> responseMap = new HashMap<>();
-    if(this.sd.isEmpty()) {
+    if (this.sd.isEmpty()) {
       responseMap.put("response", "error_viewing");
       return new CSVNotLoadedResponse(responseMap).serialize();
     }
@@ -47,6 +47,7 @@ private SharedData sd;
 
   /**
    * record to be returned on successful finding of data, data will be returned
+   *
    * @param columnHeaders
    * @param data
    */

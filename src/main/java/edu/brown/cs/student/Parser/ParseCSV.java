@@ -21,7 +21,7 @@ public class ParseCSV<T> extends Reader {
    *
    * @param buffer Destination buffer
    * @param offset Offset at which to start storing characters
-   * @param len    Maximum number of characters to read
+   * @param len Maximum number of characters to read
    * @return
    */
   @Override
@@ -29,9 +29,7 @@ public class ParseCSV<T> extends Reader {
     return reader.read(buffer, offset, len);
   }
 
-  /**
-   * must implement these two methods in order to extend Reader (read and close)
-   */
+  /** must implement these two methods in order to extend Reader (read and close) */
   @Override
   public void close() throws IOException {
     reader.close();
@@ -40,10 +38,11 @@ public class ParseCSV<T> extends Reader {
   /**
    * constructor for ParseCSV
    *
-   * @param reader   type of reader to be used (StringReader, FileReader, ...)
+   * @param reader type of reader to be used (StringReader, FileReader, ...)
    * @param dataType type of data which is going to be parsed, uses the CreatorFromRow for this
    */
-  public ParseCSV(Reader reader, CreatorFromRow<T> dataType, Boolean columnHeaders) throws IOException{
+  public ParseCSV(Reader reader, CreatorFromRow<T> dataType, Boolean columnHeaders)
+      throws IOException {
     parseData(reader, dataType, columnHeaders);
   }
 
@@ -60,10 +59,11 @@ public class ParseCSV<T> extends Reader {
    * count, we fill 'null' in empty spots. Use CreatorFromRow to sort input string into any
    * designated type
    *
-   * @param reader   type of reader to be used (StringReader, FileReader, ...)
+   * @param reader type of reader to be used (StringReader, FileReader, ...)
    * @param dataType type of data which is going to be parsed, uses the CreatorFromRow for this
    */
-  public void parseData(Reader reader, CreatorFromRow<T> dataType, Boolean columnHeaders) throws IOException{
+  public void parseData(Reader reader, CreatorFromRow<T> dataType, Boolean columnHeaders)
+      throws IOException {
     int numCols = -1;
     this.parsedData = new ArrayList<>();
     BufferedReader bufferedReader = new BufferedReader(reader);
@@ -116,6 +116,6 @@ public class ParseCSV<T> extends Reader {
     } catch (FactoryFailureException io) {
     }
     // Close the readers
-      bufferedReader.close();
+    bufferedReader.close();
   }
 }

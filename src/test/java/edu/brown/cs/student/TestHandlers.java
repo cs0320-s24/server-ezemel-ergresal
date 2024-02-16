@@ -1,38 +1,38 @@
-//package edu.brown.cs.student;
+// package edu.brown.cs.student;
 //
-//import static org.testng.AssertJUnit.assertEquals;
+// import static org.testng.AssertJUnit.assertEquals;
 //
-//import com.squareup.moshi.JsonAdapter;
-//import com.squareup.moshi.Moshi;
-//import com.squareup.moshi.Types;
-//import edu.brown.cs.student.Broadband.BroadbandHandler;
-//import edu.brown.cs.student.Broadband.Response;
-//import edu.brown.cs.student.server.LoadCSVHandler;
-//import edu.brown.cs.student.server.SearchCSVHandler;
-//import edu.brown.cs.student.server.Server;
-//import edu.brown.cs.student.server.ViewCSVHandler;
-//import java.io.BufferedReader;
-//import java.io.IOException;
-//import java.io.InputStream;
-//import java.io.InputStreamReader;
-//import java.lang.reflect.Type;
-//import java.net.HttpURLConnection;
-//import java.net.URL;
-//import java.nio.Buffer;
-//import java.util.ArrayList;
-//import java.util.HashMap;
-//import java.util.Map;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
-//import org.junit.Before;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.BeforeAll;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import spark.Request;
-//import spark.Spark;
+// import com.squareup.moshi.JsonAdapter;
+// import com.squareup.moshi.Moshi;
+// import com.squareup.moshi.Types;
+// import edu.brown.cs.student.Broadband.BroadbandHandler;
+// import edu.brown.cs.student.Broadband.Response;
+// import edu.brown.cs.student.server.LoadCSVHandler;
+// import edu.brown.cs.student.server.SearchCSVHandler;
+// import edu.brown.cs.student.server.Server;
+// import edu.brown.cs.student.server.ViewCSVHandler;
+// import java.io.BufferedReader;
+// import java.io.IOException;
+// import java.io.InputStream;
+// import java.io.InputStreamReader;
+// import java.lang.reflect.Type;
+// import java.net.HttpURLConnection;
+// import java.net.URL;
+// import java.nio.Buffer;
+// import java.util.ArrayList;
+// import java.util.HashMap;
+// import java.util.Map;
+// import java.util.logging.Level;
+// import java.util.logging.Logger;
+// import org.junit.Before;
+// import org.junit.jupiter.api.AfterEach;
+// import org.junit.jupiter.api.BeforeAll;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import spark.Request;
+// import spark.Spark;
 //
-//public class TestHandlers {
+// public class TestHandlers {
 //
 //  private final JsonAdapter<Map<String, Object>> adapter;
 //  private SharedData sharedData;
@@ -101,7 +101,7 @@
 //  public void testLoadHandler() throws IOException {
 //    HttpURLConnection clientConnectionLoad = tryRequest(
 //        "loadcsv?filename=/stars/ten-star.csv&columnheaders=true");
-////loading csv
+//// loading csv
 //    assertEquals(200, clientConnectionLoad.getResponseCode());
 //    InputStream inputStream = clientConnectionLoad.getInputStream();
 //    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -119,7 +119,8 @@
 //    reader2.close();
 //    inputStream2.close();
 //    assertEquals(output2,
-//        "{\"response_type\":\"Error: Specified file not found in the protected data directory.\"}");
+//        "{\"response_type\":\"Error: Specified file not found in the protected data
+// directory.\"}");
 //// new data set, ri_income
 //    HttpURLConnection clientConnectionRI = tryRequest(
 //        "loadcsv?filename=/census/ri_income.csv");
@@ -154,7 +155,8 @@
 //    reader4.close();
 //    inputStream4.close();
 //    assertEquals(output4,
-//        "{\"columnHeaders\":[\"StarID\",\"ProperName\",\"X\",\"Y\",\"Z\"],\"data\":[[\"0\",\"Sol\",\"0\",\"0\",\"0\"],[\"1\",\"\",\"282.43485\",\"0.00449\",\"5.36884\"],[\"2\",\"\",\"43.04329\",\"0.00285\",\"-15.24144\"],[\"3\",\"\",\"277.11358\",\"0.02422\",\"223.27753\"],[\"3759\",\"96 G. Psc\",\"7.26388\",\"1.55643\",\"0.68697\"],[\"70667\",\"Proxima Centauri\",\"-0.47175\",\"-0.36132\",\"-1.15037\"],[\"71454\",\"Rigel Kentaurus B\",\"-0.50359\",\"-0.42128\",\"-1.1767\"],[\"71457\",\"Rigel Kentaurus A\",\"-0.50362\",\"-0.42139\",\"-1.17665\"],[\"87666\",\"Barnard's Star\",\"-0.01729\",\"-1.81533\",\"0.14824\"],[\"118721\",\"\",\"-2.28262\",\"0.64697\",\"0.29354\"]]}> but was:</stars/ten-star.csv loaded successfully");
+//
+// "{\"columnHeaders\":[\"StarID\",\"ProperName\",\"X\",\"Y\",\"Z\"],\"data\":[[\"0\",\"Sol\",\"0\",\"0\",\"0\"],[\"1\",\"\",\"282.43485\",\"0.00449\",\"5.36884\"],[\"2\",\"\",\"43.04329\",\"0.00285\",\"-15.24144\"],[\"3\",\"\",\"277.11358\",\"0.02422\",\"223.27753\"],[\"3759\",\"96 G. Psc\",\"7.26388\",\"1.55643\",\"0.68697\"],[\"70667\",\"Proxima Centauri\",\"-0.47175\",\"-0.36132\",\"-1.15037\"],[\"71454\",\"Rigel Kentaurus B\",\"-0.50359\",\"-0.42128\",\"-1.1767\"],[\"71457\",\"Rigel Kentaurus A\",\"-0.50362\",\"-0.42139\",\"-1.17665\"],[\"87666\",\"Barnard's Star\",\"-0.01729\",\"-1.81533\",\"0.14824\"],[\"118721\",\"\",\"-2.28262\",\"0.64697\",\"0.29354\"]]}> but was:</stars/ten-star.csv loaded successfully");
 //  }
 //
 //  @Test
@@ -218,4 +220,4 @@
 //
 //
 //  }
-//}
+// }

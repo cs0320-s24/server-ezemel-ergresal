@@ -9,7 +9,8 @@ public class BroadbandResponse implements Response {
   private String state;
   private String percentageBroadband;
 
-  public BroadbandResponse(String time, String countyName, String state, String percentageBroadband) {
+  public BroadbandResponse(
+      String time, String countyName, String state, String percentageBroadband) {
     this.timeZone = "EST";
     this.time = time;
     this.countyName = countyName;

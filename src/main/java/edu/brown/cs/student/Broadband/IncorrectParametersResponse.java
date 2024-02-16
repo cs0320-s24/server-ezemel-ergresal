@@ -7,6 +7,8 @@ public record IncorrectParametersResponse(String error, Map<String, Object> resp
 
   public String serialize() {
     Moshi moshi = new Moshi.Builder().build();
-    return moshi.adapter(edu.brown.cs.student.Broadband.IncorrectParametersResponse.class).toJson(this);
+    return moshi
+        .adapter(edu.brown.cs.student.Broadband.IncorrectParametersResponse.class)
+        .toJson(this);
   }
 }

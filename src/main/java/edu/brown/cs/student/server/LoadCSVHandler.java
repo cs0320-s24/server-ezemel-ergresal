@@ -10,15 +10,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-/**
- * Handler for loading the csv. Simply loads data content into
- */
+/** Handler for loading the csv. Simply loads data content into */
 public class LoadCSVHandler implements Route {
 
   static Map<String, Object> responseMap;
@@ -26,13 +23,13 @@ public class LoadCSVHandler implements Route {
   private SharedData sharedData;
 
   /**
-   * this handler is used to load csv handler from a given filename.
-   * The user must input a query 'filename', which is the filename as it is found
-   * after the data package found in the current directory.
-   * If the filename is valid, the CSVParse class parses the data, and puts it into
-   * the sharedData. Then, if all works out, a message tells the user this was successful
-   * @param sharedData a shared state which uses data injection to carry
-   *                   data across class and handlers
+   * this handler is used to load csv handler from a given filename. The user must input a query
+   * 'filename', which is the filename as it is found after the data package found in the current
+   * directory. If the filename is valid, the CSVParse class parses the data, and puts it into the
+   * sharedData. Then, if all works out, a message tells the user this was successful
+   *
+   * @param sharedData a shared state which uses data injection to carry data across class and
+   *     handlers
    */
   public LoadCSVHandler(SharedData sharedData) {
     this.sharedData = sharedData;
@@ -40,6 +37,7 @@ public class LoadCSVHandler implements Route {
 
   /**
    * handle method for loadcsv, see above for particulars.
+   *
    * @param request
    * @param response
    * @return
@@ -50,14 +48,14 @@ public class LoadCSVHandler implements Route {
     this.responseMap = new HashMap<>();
 
     String filename = request.queryParams("filename");
-    if (filename == null){
+    if (filename == null) {
       this.responseMap.put("error_bad_request", "no file name specified");
       return this.responseMap;
     }
     String columnHeaders = request.queryParams("columnheaders");
     Boolean columnHeadersQuery = false;
     if (columnHeaders != null) {
-      if (columnHeaders.equals("true")) { //default is false
+      if (columnHeaders.equals("true")) { // default is false
         columnHeadersQuery = true;
       }
     }
@@ -65,21 +63,19 @@ public class LoadCSVHandler implements Route {
     filename = currentPath + "/data" + filename;
     ParseCSV<String> fileReader;
     CreatorFromRow<String> myCreator = new StringCreatorFromRow();
-    try { //maybe we should make parameter for columnHeaders boolean, with default = 1 or something
+    try { // maybe we should make parameter for columnHeaders boolean, with default = 1 or something
       fileReader = new ParseCSV<>(new FileReader(filename), myCreator, columnHeadersQuery);
     } catch (FileNotFoundException f) {
       return new FileNotFoundResponse().serialize();
     } catch (IOException i) {
-      return "Error with reader closing/parsing file: "+ filename;
+      return "Error with reader closing/parsing file: " + filename;
     }
     this.sharedData.put(fileReader.getParsedData(), fileReader.getColumnHeaders());
 
     return request.queryParams("filename") + " loaded successfully!";
   }
 
-  /**
-   * Response object to send, containing a soup with certain ingredients in it
-   */
+  /** Response object to send, containing a soup with certain ingredients in it */
   public record FileFoundResponse(String response_type, Map<String, Object> responseMap) {
 
     public FileFoundResponse(Map<String, Object> responseMap) {
@@ -105,9 +101,7 @@ public class LoadCSVHandler implements Route {
     }
   }
 
-  /**
-   * Response object to send if file is not found
-   */
+  /** Response object to send if file is not found */
   public record FileNotFoundResponse(String response_type) {
 
     public FileNotFoundResponse() {
@@ -122,6 +116,4 @@ public class LoadCSVHandler implements Route {
       return moshi.adapter(FileNotFoundResponse.class).toJson(this);
     }
   }
-
 }
-
