@@ -97,7 +97,7 @@ public class BroadbandHandler implements Route {
       }
       state = this.stateCodes.get(state);
 
-      responseMap.put("state", state);
+//      responseMap.put("state", state);
       if (state == null) {
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataStateResponse(state, responseMap);
