@@ -5,7 +5,7 @@ import com.squareup.moshi.Moshi;
 import java.util.Map;
 import java.util.Set;
 
-public record IncorrectParametersResponse(String error, Set paramsEntered) {
+public record IncorrectParametersResponse(String error, Map<String, Object> responseMap) {
 
   public String serialize() {
     Moshi moshi = new Moshi.Builder().build();

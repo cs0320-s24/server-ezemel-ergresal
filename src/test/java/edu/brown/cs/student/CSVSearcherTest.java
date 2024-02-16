@@ -57,7 +57,23 @@ public class CSVSearcherTest {
     assertFalse(searcherStars.startSearcher(starData, null));
     assertFalse(searcherStars.startSearcher(starData, "null"));
   }
+@Test
+public void testNewRIFile() throws IOException {
+  ParseCSV<String> fileReader =
+      new ParseCSV<String>(
+          new FileReader(
+              "/Users/bittygresalfi/Desktop/cs32/server-ezemel-ergresal/data/census/ri_income.csv"),
+          myCreator,
+          true);
+  List<List<String>> starData = fileReader.getParsedData();
+  List<String> starCH = fileReader.getColumnHeaders();
 
+  SearchCSV<String> searcherStars = new SearchCSV<>();
+
+  // search using column
+  assertTrue(searcherStars.startSearcher(starData, starCH, "\"96,824.00\"", true, -1));
+  assertTrue(searcherStars.startSearcher(starData, starCH, "Burrillville", true, -1));
+}
   @Test
   public void testTextSearch() throws IOException {
     ParseCSV<String> stringReader =

@@ -45,12 +45,11 @@ public class LoadCSVHandler implements Route {
     ParseCSV<String> fileReader;
     CreatorFromRow<String> myCreator = new StringCreatorFromRow();
     try { //maybe we should make parameter for columnHeaders boolean, with default = 1 or something
-      fileReader = new ParseCSV<String>(new FileReader(filename), myCreator, columnHeadersQuery);
+      fileReader = new ParseCSV<>(new FileReader(filename), myCreator, columnHeadersQuery);
     } catch (FileNotFoundException f) {
       return new FileNotFoundResponse().serialize();
-
     } catch (IOException i) {
-      return "Error with reader closing/parsing file";
+      return "Error with reader closing/parsing file: "+ filename;
     }
     this.sharedData.put(fileReader.getParsedData(), fileReader.getColumnHeaders());
 //    this.csvData = fileReader.getParsedData();
