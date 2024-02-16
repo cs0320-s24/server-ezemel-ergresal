@@ -1,3 +1,18 @@
 JUnit tests should go in this directory.
 
 Make sure you package these classes properly so that you earn the Code Organization Badge!
+
+URL requestURL = new URL( spec: "http: localhost:" + Spark.port() + "/" + "broadband?state:
+requestURL. openConnection);
+//test expected values for ENTRY 2
+assertEquals expected: "success", responseBody.get("result")); assertEquals expected: "fakeResult", responseBody. get ("broadband data"));
+stats = cachingSource. getStats);
+assertTrue( condition: stats.hitCount()==0);
+//query the same thing as before
+//loadConnection = tryRequest("broadband?state=California&county=fakeCounty");
+requestURL = new URL( spec: "http://localhost:" + Spark.port() + "/broadband?state=Californ
+requestURL. openConnection();
+/test expected values for ENTRY 3
+assertEquals expected: "success", responseBody.get("result")); assertEquals expected: "fakeResult", responseBody.get("broadband data"));
+stats = cachingSource.getStats);
+assertTrue( condition: stats.hitCount(==1);
