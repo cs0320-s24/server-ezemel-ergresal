@@ -42,7 +42,7 @@ private static int port = 2222;
         new ViewCSVHandler(sharedData));
     Spark.get("searchcsv",
         new SearchCSVHandler(sharedData));
-    Spark.get("broadband", new BroadbandHandler(12345678));
+    Spark.get("broadband", new BroadbandHandler());
     Spark.init();
     Spark.awaitInitialization();
   }

@@ -33,10 +33,17 @@ public class BroadbandHandler implements Route {
 //   maps state to map of county codes to broadband response
   private StateCache cache;
 
-  public BroadbandHandler(int timeToEvict) {
-    this.cache = new StateCache(timeToEvict);
+  public BroadbandHandler() {
+    this.cache = new StateCache();
   }
 
+  public BroadbandHandler(int maxEntries, int minutesToEvict) {
+    this.cache = new StateCache(maxEntries, minutesToEvict);
+  }
+
+  public BroadbandHandler(int maxEntries) {
+    this.cache = new StateCache(maxEntries);
+  }
 
   /**
    * This handle method needs to be filled by any class implementing Route. When the path set in
