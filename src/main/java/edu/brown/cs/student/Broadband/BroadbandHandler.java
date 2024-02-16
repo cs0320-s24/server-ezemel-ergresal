@@ -1,11 +1,7 @@
 package edu.brown.cs.student.Broadband;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import spark.Request;
@@ -29,23 +25,11 @@ import spark.Route;
  */
 public class BroadbandHandler implements Route {
 
-
-//  private Map<String, Map<String, BroadbandResponse>> parsedStates = new HashMap<>(); // list of data for each state weve parsed
-//   maps state to map of county codes to broadband response
   private Datasource source;
 
   public BroadbandHandler(Datasource source) {
     this.source = source;
-//            new StateCache();
   }
-
-//  public BroadbandHandler(int maxEntries, int minutesToEvict) {
-//    this.source = new StateCache(maxEntries, minutesToEvict);
-//  }
-//
-//  public BroadbandHandler(int maxEntries) {
-//    this.source = new StateCache(maxEntries);
-//  }
 
   /**
    * This handle method needs to be filled by any class implementing Route. When the path set in
@@ -77,29 +61,7 @@ public class BroadbandHandler implements Route {
     }
     String county = request.queryParams("county").toLowerCase();
     String state = request.queryParams("state").toLowerCase();
-
-//    try {
-//      if (this.stateCodes.isEmpty()) {
-//        fillStateCodeMap();
-//      }
-//      if (this.stateCodes.get(state) == null) {
-//        responseMap.put("result", "error_datasource");
-//        return new NoBroadbandDataStateResponse(state, responseMap);
-//      }
-//      String stateCode = this.stateCodes.get(state);
-//      if (county.equals("")) {
-//        responseMap.put("result", "error_datasource");
-//        return new NoBroadbandDataCountyResponse(county, responseMap);
-//      }
       return this.source.query(state, county, responseMap);
-      //responseMap.put("response", this.source.query(state, county).serialize());
-//      responseMap.put("result", "success");
-//      return responseMap;
-//    } catch (Exception e) {
-//      responseMap.put("result", "error_datasource");
-////      System.out.println(e.getMessage());
-//      return new NoBroadbandDataCountyResponse(county, responseMap).serialize();
-//    }
   }
 
 
