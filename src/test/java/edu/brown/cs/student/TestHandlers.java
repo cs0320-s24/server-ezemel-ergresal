@@ -37,7 +37,7 @@
 //  private final JsonAdapter<Map<String, Object>> adapter;
 //  private SharedData sharedData;
 //  private Server server;
-//  private int port = 1025;
+//  private static int port = 3232;
 //
 //  public TestHandlers() {
 //    Moshi moshi = new Moshi.Builder().build();
@@ -53,36 +53,37 @@
 //
 //  @Before
 //  public void setup() {
-//    this.server = new Server(new SharedData(new ArrayList<>(), new ArrayList<>()));
+//    this.server = new Server(sharedData);
 //  }
 //
 //  @AfterEach
 //  public void teardown() {
 //    // Gracefully stop Spark listening on both endpoints after each test
-//    Spark.unmap("loadcsv");
-//    Spark.unmap("searchcsv");
-//    Spark.unmap("viewcsv");
+////    Spark.unmap("loadcsv");
+////    Spark.unmap("searchcsv");
+////    Spark.unmap("viewcsv");
+////    Spark.unmap("broadband");
 //    this.server = null;
 //    Spark.awaitStop(); // don't proceed until the server is stopped
 //  }
 //
-//  @Test
-//  public void testViewCSVHandlerSuccess() throws IOException {
-//    Request mockRequest = mock(Request.class);
-//    Response mockResponse = mock(Response.class);
-//
-//    // Define behavior for the mock objects
-//    when(mockRequest.queryParams("param")).thenReturn("value");
-//
-//    // Invoke your server handler method
-//    new ViewCSVHandler(server.getSharedData()).handle(mockRequest, mockResponse);
-//
-//    // Verify the behavior of the handler
-//    assertEquals(mockResponse, 200);
-//    assertEquals(mockResponse.serialize(), "Expected Response Body");
-//  }
+//  //  @Test
+////  public void testViewCSVHandlerSuccess() throws IOException {
+////    Request mockRequest = mock(Request.class);
+////    Response mockResponse = mock(Response.class);
+////
+////    // Define behavior for the mock objects
+////    when(mockRequest.queryParams("param")).thenReturn("value");
+////
+////    // Invoke your server handler method
+////    new ViewCSVHandler(server.getSharedData()).handle(mockRequest, mockResponse);
+////
+////    // Verify the behavior of the handler
+////    assertEquals(mockResponse, 200);
+////    assertEquals(mockResponse.serialize(), "Expected Response Body");
+////  }
 //  private static HttpURLConnection tryRequest(String apiCall) throws IOException {
-//    URL requestURL = new URL("http://localhost:3232/" + apiCall);
+//    URL requestURL = new URL("http://localhost:+" + port + "/" + apiCall);
 //    HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
 //
 //    clientConnection.setRequestMethod("GET");
@@ -93,6 +94,7 @@
 //
 //  /**
 //   * testing whether handlers throw errors or not
+//   *
 //   * @throws IOException
 //   */
 //  @Test
@@ -116,7 +118,8 @@
 //    String output2 = reader2.readLine();
 //    reader2.close();
 //    inputStream2.close();
-//    assertEquals(output2, "{\"response_type\":\"Error: Specified file not found in the protected data directory.\"}");
+//    assertEquals(output2,
+//        "{\"response_type\":\"Error: Specified file not found in the protected data directory.\"}");
 //// new data set, ri_income
 //    HttpURLConnection clientConnectionRI = tryRequest(
 //        "loadcsv?filename=/census/ri_income.csv");
@@ -138,6 +141,7 @@
 //    inputStream4.close();
 //    assertEquals(output4, "{error_bad_request=no file name specified}");
 //  }
+//
 //  @Test
 //  public void testViewHandler() throws IOException {
 //// viewing csv
@@ -152,6 +156,7 @@
 //    assertEquals(output4,
 //        "{\"columnHeaders\":[\"StarID\",\"ProperName\",\"X\",\"Y\",\"Z\"],\"data\":[[\"0\",\"Sol\",\"0\",\"0\",\"0\"],[\"1\",\"\",\"282.43485\",\"0.00449\",\"5.36884\"],[\"2\",\"\",\"43.04329\",\"0.00285\",\"-15.24144\"],[\"3\",\"\",\"277.11358\",\"0.02422\",\"223.27753\"],[\"3759\",\"96 G. Psc\",\"7.26388\",\"1.55643\",\"0.68697\"],[\"70667\",\"Proxima Centauri\",\"-0.47175\",\"-0.36132\",\"-1.15037\"],[\"71454\",\"Rigel Kentaurus B\",\"-0.50359\",\"-0.42128\",\"-1.1767\"],[\"71457\",\"Rigel Kentaurus A\",\"-0.50362\",\"-0.42139\",\"-1.17665\"],[\"87666\",\"Barnard's Star\",\"-0.01729\",\"-1.81533\",\"0.14824\"],[\"118721\",\"\",\"-2.28262\",\"0.64697\",\"0.29354\"]]}> but was:</stars/ten-star.csv loaded successfully");
 //  }
+//
 //  @Test
 //  public void testSearchHandler() throws IOException {
 //// searching object, found

@@ -5,6 +5,7 @@ import static org.testng.AssertJUnit.assertEquals;
 import edu.brown.cs.student.Broadband.BroadbandHandler;
 import edu.brown.cs.student.server.LoadCSVHandler;
 import edu.brown.cs.student.server.SearchCSVHandler;
+import edu.brown.cs.student.server.Server;
 import edu.brown.cs.student.server.ViewCSVHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,8 +21,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import spark.Spark;
-//import edu.brown.cs32.nwsapi.datasource.mocks.MockedNWSAPISource;
-
 
 public class TestHandlersNew {
 
@@ -36,9 +35,11 @@ public class TestHandlersNew {
 
   @BeforeEach
   public void setup() {
+     startServer(new SharedData(new ArrayList<>(), new ArrayList<>()));
     // Re-initialize state, etc. for _every_ test method run
 //    this.sharedData = mock something
-
+  }
+  public void startServer(SharedData sd){
     this.sharedData = new SharedData(new ArrayList<>(), new ArrayList<>());
 
     LoadCSVHandler loadCSVHandler = new LoadCSVHandler(sharedData);
