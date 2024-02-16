@@ -26,21 +26,34 @@ import spark.Spark;
 public class TestHandlersNew {
 
   private SharedData sharedData;
-  private static int port = 2222;
+//  private static int port = 2222
+  private Server server;
 
   @BeforeAll
   public static void setup_before_everything() {
-    Spark.port(port);
+    Spark.port(0);
     Logger.getLogger("").setLevel(Level.WARNING); // empty name = root logger
   }
 
   @BeforeEach
   public void setup() {
-     startServer(new SharedData(new ArrayList<>(), new ArrayList<>()));
+    this.server = new Server(sharedData);
+    LoadCSVHandler loadCSVHandler = new LoadCSVHandler(sharedData);
+
+    Spark.get("loadcsv", loadCSVHandler);
+    Spark.get("viewcsv",
+        new ViewCSVHandler(sharedData));
+    Spark.get("searchcsv",
+        new SearchCSVHandler(sharedData));
+    Spark.get("broadband", new BroadbandHandler(new StateCache()));
+    Spark.init();
+    Spark.awaitInitialization();
+//    startServer(new SharedData(new ArrayList<>(), new ArrayList<>()));
     // Re-initialize state, etc. for _every_ test method run
 //    this.sharedData = mock something
   }
-  public void startServer(SharedData sd){
+
+  public void startServer(SharedData sd) {
     this.sharedData = sd;
 
     LoadCSVHandler loadCSVHandler = new LoadCSVHandler(sharedData);
@@ -58,15 +71,16 @@ public class TestHandlersNew {
   @AfterEach
   public void teardown() {
     // Gracefully stop Spark listening on both endpoints after each test
-    Spark.unmap("loadcsv");
-    Spark.unmap("viewcsv");
-    Spark.unmap("searchcsv");
-    Spark.unmap("broadband");
+//    Spark.unmap("loadcsv");
+//    Spark.unmap("viewcsv");
+//    Spark.unmap("searchcsv");
+//    Spark.unmap("broadband");
+    this.server = null;
     Spark.awaitStop(); // don't proceed until the server is stopped
   }
 
   private static HttpURLConnection tryRequest(String apiCall) throws IOException {
-    URL requestURL = new URL("http://localhost:" + port + "/" + apiCall);
+    URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
     HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
 
     clientConnection.setRequestMethod("GET");

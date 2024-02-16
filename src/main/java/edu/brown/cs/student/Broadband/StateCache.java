@@ -26,8 +26,6 @@ public class StateCache implements Datasource {
      * <p>
      * This version uses a Guava cache class to manage the cache.
      */
-//  public class CachedFileSearcher implements Searcher<String,String> {
-//    private final Searcher<String,String> wrappedSearcher;
     private final LoadingCache<StateCountyPair, Response> cache;
     private Map<String, String> stateCodes;
 
