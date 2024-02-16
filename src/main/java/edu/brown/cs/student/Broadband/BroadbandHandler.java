@@ -23,13 +23,16 @@ import spark.Route;
  */
 public class BroadbandHandler implements Route {
 
+
   //  private Map<String, Map<String, BroadbandResponse>> parsedStates = new HashMap<>(); // list of
   // data for each state weve parsed
   //   maps state to map of county codes to broadband response
+
   private Datasource source;
 
   public BroadbandHandler(Datasource source) {
     this.source = source;
+
     //            new StateCache();
   }
 
@@ -40,6 +43,9 @@ public class BroadbandHandler implements Route {
   //  public BroadbandHandler(int maxEntries) {
   //    this.source = new StateCache(maxEntries);
   //  }
+
+
+
 
   /**
    * This handle method needs to be filled by any class implementing Route. When the path set in
@@ -72,6 +78,7 @@ public class BroadbandHandler implements Route {
     String county = request.queryParams("county").toLowerCase();
     String state = request.queryParams("state").toLowerCase();
 
+
     //    try {
     //      if (this.stateCodes.isEmpty()) {
     //        fillStateCodeMap();
@@ -94,5 +101,6 @@ public class BroadbandHandler implements Route {
     ////      System.out.println(e.getMessage());
     //      return new NoBroadbandDataCountyResponse(county, responseMap).serialize();
     //    }
+
   }
 }
