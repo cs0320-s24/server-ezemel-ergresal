@@ -31,6 +31,12 @@ public class BroadbandHandler implements Route {
   private Map<String, String> stateCodes = new HashMap<>();
   private Map<String, Map<String, BroadbandResponse>> parsedStates = new HashMap<>(); // list of data for each state weve parsed
 //   maps state to map of county codes to broadband response
+  private StateCache cache;
+
+  public BroadbandHandler(int timeToEvict) {
+    this.cache = new StateCache(timeToEvict);
+  }
+
 
   /**
    * This handle method needs to be filled by any class implementing Route. When the path set in
@@ -53,8 +59,8 @@ public class BroadbandHandler implements Route {
     // endpoint
 //    Set<String> params = request.queryParams();
     Map<String, Object> responseMap = new HashMap<>();
-    String county = request.queryParams("county");
-    String state = request.queryParams("state");
+    String county = request.queryParams("county").toLowerCase();
+    String state = request.queryParams("state").toLowerCase();
     if (request.queryParams().isEmpty() || !request.queryParams().contains("county")
         || !request.queryParams().contains("state")) {
       request.queryParams().add("error_datasource");
@@ -96,8 +102,8 @@ public class BroadbandHandler implements Route {
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataStateResponse(state, responseMap);
       }
-      county = fillAndFindCountyData(state, county);
-      responseMap.put("county", county);
+//      county = fillAndFindCountyData(state, county);
+//      responseMap.put("county", county);
       if (county.equals("")) {
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataCountyResponse(county, responseMap);
@@ -112,11 +118,16 @@ public class BroadbandHandler implements Route {
 //      responseMap.put("percentage broadband/high speed internet access",
 //          this.parsedStates.get(county).getPercentageBroadband());
 
-      responseMap.put("response", this.parsedStates.get(state).get(county).serialize());
+//      responseMap.put("response", this.parsedStates.get(state).get(county).serialize());
+      responseMap.put("response", this.cache.get(state, county).serialize());
       responseMap.put("result", "success");
       return responseMap;
+    } catch(IllegalArgumentException e) {
+      responseMap.put("result", "error_datasource");
+      return new NoBroadbandDataCountyResponse(county, responseMap);
     } catch (Exception e) {
       responseMap.put("result", "error_datasource");
+      System.out.println(e.getMessage());
       return new NoBroadbandDataStateResponse(state, responseMap).serialize();
     }
 
@@ -131,60 +142,60 @@ public class BroadbandHandler implements Route {
   }
 
 
-  private String sendRequest(String county, String state)
-      throws URISyntaxException, IOException, InterruptedException {
-//    https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&
-//     first neeed to convert county and state into number codes
-//    URL requestURL = new URL("https", "api.census.gov",
-//        http://localhost:3232/broadband?state=36&county=059
-
-    String urlString = String.format(
-        "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:%s&in=state:%s",
-        county, state);
-    System.out.println(urlString);
-    URI requestURI = new URI(urlString);
-
-    // Build the HTTP request
-    HttpRequest request = HttpRequest.newBuilder()
-        .uri(requestURI)
-        .GET()
-        .build();
-
-    // Send the HTTP request and store the response
-    HttpResponse<String> response = HttpClient.newHttpClient()
-        .send(request, HttpResponse.BodyHandlers.ofString());
-
-    System.out.println(response);
-    System.out.println(response.body());
-
-    // deserialize the JSON response if needed
-    Moshi moshi = new Moshi.Builder().build();
-    JsonAdapter<List> adapter = moshi.adapter(List.class);
-    List<List<String>> responseData = adapter.fromJson(response.body());
-//    BroadbandResponse responseData = adapter.fromJson(response.body());
-
-    return response.body();
-//    return broadbandResponse.toString();
-  }
+//  private String sendRequest(String county, String state)
+//      throws URISyntaxException, IOException, InterruptedException {
+////    https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&
+////     first neeed to convert county and state into number codes
+////    URL requestURL = new URL("https", "api.census.gov",
+////        http://localhost:3232/broadband?state=36&county=059
+//
+//    String urlString = String.format(
+//        "https://api.census.gov/data/2021/acs/acs1/subject/variables?get=NAME,S2802_C03_022E&for=county:%s&in=state:%s",
+//        county, state);
+//    System.out.println(urlString);
+//    URI requestURI = new URI(urlString);
+//
+//    // Build the HTTP request
+//    HttpRequest request = HttpRequest.newBuilder()
+//        .uri(requestURI)
+//        .GET()
+//        .build();
+//
+//    // Send the HTTP request and store the response
+//    HttpResponse<String> response = HttpClient.newHttpClient()
+//        .send(request, HttpResponse.BodyHandlers.ofString());
+//
+//    System.out.println(response);
+//    System.out.println(response.body());
+//
+//    // deserialize the JSON response if needed
+//    Moshi moshi = new Moshi.Builder().build();
+//    JsonAdapter<List> adapter = moshi.adapter(List.class);
+//    List<List<String>> responseData = adapter.fromJson(response.body());
+////    BroadbandResponse responseData = adapter.fromJson(response.body());
+//
+//    return response.body();
+////    return broadbandResponse.toString();
+//  }
 
   /**
    * Private helper method; throws IOException so different callers can handle differently if
    * needed. //TODO: change filenotfoundexception
    */
-  private static HttpURLConnection connect(URL requestURL)
-      throws FileNotFoundException, IOException {
-    URLConnection urlConnection = requestURL.openConnection();
-    if (!(urlConnection instanceof HttpURLConnection)) {
-      throw new FileNotFoundException("unexpected: result of connection wasn't HTTP");
-    }
-    HttpURLConnection clientConnection = (HttpURLConnection) urlConnection;
-    clientConnection.connect(); // GET
-    if (clientConnection.getResponseCode() != 200) {
-      throw new FileNotFoundException(
-          "unexpected: API connection not success status " + clientConnection.getResponseMessage());
-    }
-    return clientConnection;
-  }
+//  private static HttpURLConnection connect(URL requestURL)
+//      throws FileNotFoundException, IOException {
+//    URLConnection urlConnection = requestURL.openConnection();
+//    if (!(urlConnection instanceof HttpURLConnection)) {
+//      throw new FileNotFoundException("unexpected: result of connection wasn't HTTP");
+//    }
+//    HttpURLConnection clientConnection = (HttpURLConnection) urlConnection;
+//    clientConnection.connect(); // GET
+//    if (clientConnection.getResponseCode() != 200) {
+//      throw new FileNotFoundException(
+//          "unexpected: API connection not success status " + clientConnection.getResponseMessage());
+//    }
+//    return clientConnection;
+//  }
 
   private void fillStateCodeMap() {
     try {
