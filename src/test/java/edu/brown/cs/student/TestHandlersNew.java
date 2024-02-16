@@ -1,5 +1,7 @@
 package edu.brown.cs.student;
+
 import static org.testng.AssertJUnit.assertEquals;
+
 import edu.brown.cs.student.Broadband.BroadbandHandler;
 import edu.brown.cs.student.server.LoadCSVHandler;
 import edu.brown.cs.student.server.SearchCSVHandler;
@@ -22,8 +24,10 @@ import spark.Spark;
 
 
 public class TestHandlersNew {
-private SharedData sharedData;
-private static int port = 2222;
+
+  private SharedData sharedData;
+  private static int port = 2222;
+
   @BeforeAll
   public static void setup_before_everything() {
     Spark.port(port);
@@ -48,6 +52,7 @@ private static int port = 2222;
     Spark.init();
     Spark.awaitInitialization();
   }
+
   @AfterEach
   public void teardown() {
     // Gracefully stop Spark listening on both endpoints after each test
@@ -57,8 +62,9 @@ private static int port = 2222;
     Spark.unmap("broadband");
     Spark.awaitStop(); // don't proceed until the server is stopped
   }
-    private static HttpURLConnection tryRequest(String apiCall) throws IOException {
-    URL requestURL = new URL("http://localhost:2222/"+apiCall);
+
+  private static HttpURLConnection tryRequest(String apiCall) throws IOException {
+    URL requestURL = new URL("http://localhost:" + port + "/" + apiCall);
     HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
 
     clientConnection.setRequestMethod("GET");
@@ -69,6 +75,7 @@ private static int port = 2222;
 
   /**
    * testing whether handlers throw errors or not
+   *
    * @throws IOException
    */
   @Test
@@ -92,7 +99,8 @@ private static int port = 2222;
     String output2 = reader2.readLine();
     reader2.close();
     inputStream2.close();
-    assertEquals(output2, "{\"response_type\":\"Error: Specified file not found in the protected data directory.\"}");
+    assertEquals(output2,
+        "{\"response_type\":\"Error: Specified file not found in the protected data directory.\"}");
 // new data set, ri_income
     HttpURLConnection clientConnectionRI = tryRequest(
         "loadcsv?filename=/census/ri_income.csv");
@@ -114,6 +122,7 @@ private static int port = 2222;
     inputStream4.close();
     assertEquals(output4, "{error_bad_request=no file name specified}");
   }
+
   @Test
   public void testViewHandler() throws IOException {
     tryRequest(
@@ -128,7 +137,8 @@ private static int port = 2222;
     reader.close();
     inputStream.close();
     assertEquals(output, "/stars/ten-star.csv loaded successfully!");
-}
+  }
+
   @Test
   public void testSearchHandler() throws IOException {
 // searching object, found
