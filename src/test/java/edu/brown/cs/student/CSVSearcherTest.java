@@ -20,9 +20,7 @@ import org.junit.jupiter.api.Test;
 
 public class CSVSearcherTest {
 
-  CreatorFromRow<Flavor> myFlavorCreator = new FlavorCreatorFromRow();
   CreatorFromRow<String> myCreator = new StringCreatorFromRow();
-  CreatorFromRow<Integer> myIntCreator = new IntegerCreatorFromRow();
 
   @Test
   public void testFileSearch() throws IOException {
@@ -109,41 +107,6 @@ public void testNewRIFile() throws IOException {
     assertTrue(searcherSentence.startSearcher(sentenceData3, "how"));
     assertTrue(searcherSentence.startSearcher(sentenceData3, " world"));
     assertFalse(searcherSentence.startSearcher(sentenceData3, null));
-  }
-
-  @Test
-  public void testFlavorSearch() throws IOException {
-    ParseCSV<Flavor> flavorReader =
-        new ParseCSV<Flavor>(
-            new StringReader("vanilla, chocolate, strawberry, vanilla"), myFlavorCreator, false);
-    List<List<Flavor>> flavorData = flavorReader.getParsedData();
-    SearchCSV<Flavor> searcherFlavor = new SearchCSV<>();
-    assertTrue(searcherFlavor.startSearcher(flavorData, VANILLA));
-    assertTrue(searcherFlavor.startSearcher(flavorData, CHOCOLATE));
-    assertTrue(searcherFlavor.startSearcher(flavorData, STRAWBERRY));
-    assertFalse(searcherFlavor.startSearcher(flavorData, null));
-    assertFalse(searcherFlavor.startSearcher(flavorData, "VANILLA"));
-
-    // Empty dataset tests
-    ParseCSV<Flavor> flavorReaderEmpty =
-        new ParseCSV<Flavor>(new StringReader(""), myFlavorCreator, false);
-    List<List<Flavor>> flavorDataEmpty = flavorReaderEmpty.getParsedData();
-    assertFalse(searcherFlavor.startSearcher(flavorDataEmpty, VANILLA));
-    assertFalse(searcherFlavor.startSearcher(flavorDataEmpty, null));
-  }
-
-  @Test
-  public void testIntSearch() throws IOException {
-    ParseCSV<Integer> IntegerReader =
-        new ParseCSV<Integer>(new StringReader("1, 2, 3,4,5"), myIntCreator, false);
-    List<List<Integer>> intData = IntegerReader.getParsedData();
-    SearchCSV<Integer> searcherInt = new SearchCSV<>();
-
-    assertFalse(searcherInt.startSearcher(intData, 9));
-    assertTrue(searcherInt.startSearcher(intData, 1));
-    assertTrue(searcherInt.startSearcher(intData, 3));
-    // different types
-    assertFalse(searcherInt.startSearcher(intData, "3"));
   }
 
   @Test

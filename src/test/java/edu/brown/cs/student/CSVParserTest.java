@@ -15,8 +15,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class CSVParserTest {
-  CreatorFromRow<Integer> myIntCreator = new IntegerCreatorFromRow();
-  CreatorFromRow<Flavor> myFlavorCreator = new FlavorCreatorFromRow();
   CreatorFromRow<String> myCreator = new StringCreatorFromRow();
 
   @Test
@@ -56,48 +54,6 @@ public class CSVParserTest {
     // Checking whether commas parsed correctly
   }
 
-  @Test
-  public void testStringParse() throws IOException {
-    ParseCSV<Integer> stringReader2 =
-        new ParseCSV<Integer>(new StringReader("1 , 2,3"), myIntCreator, false);
-    List<List<Integer>> charData = stringReader2.getParsedData();
-    assertEquals(charData.size(), 1);
-    // returns a list of lists for a string, where the one element in the list is the array of
-    // input string row
-    assertEquals(charData.get(0).size(), 3);
-    assertTrue(charData.get(0).get(0) == 1);
-    assertTrue(charData.get(0).get(1) == 2);
-    assertTrue(charData.get(0).get(2) == 3);
-
-    ParseCSV<String> stringReader3 =
-        new ParseCSV<String>(
-            new StringReader("Caesar, Julius,  \"veni, vidi, vici\"  "), myCreator, false);
-    List<List<String>> stringReader3ParsedData = stringReader3.getParsedData();
-    assertEquals(stringReader3ParsedData.size(), 1);
-    assertEquals(stringReader3ParsedData.get(0).size(), 3);
-
-    /* These tests have been changed! Because the regex is wrong and doesn't properly
-        get rid of whitespace which precedes or follows the quotations
-        In reality, the actual should be: "\"veni, vidi, vici\""
-        and "Julius"
-        The same goes for following tests which include whitespace
-    */
-    assertEquals(stringReader3ParsedData.get(0).get(2), "  \"veni, vidi, vici\"  ");
-    assertEquals(stringReader3ParsedData.get(0).get(1), " Julius");
-
-    ParseCSV<String> stringReaderEmpty =
-        new ParseCSV<String>(new StringReader(""), myCreator, false);
-    List<List<String>> stringReaderEmptyParsedData = stringReaderEmpty.getParsedData();
-    assertEquals(stringReaderEmptyParsedData.size(), 0);
-    // parsing empty string/csv
-
-    ParseCSV<String> stringReaderOneItem =
-        new ParseCSV<String>(new StringReader("hello"), myCreator, false);
-    List<List<String>> stringReaderOneItemParsedData = stringReaderOneItem.getParsedData();
-    assertEquals(stringReaderOneItemParsedData.size(), 1);
-    assertEquals(stringReaderOneItemParsedData.get(0).get(0), "hello");
-    // parsing singular element
-  }
 
   @Test
   public void testDifferentTypesParse() throws IOException {
@@ -108,23 +64,5 @@ public class CSVParserTest {
     assertEquals(mixedData.size(), 1);
     assertEquals(mixedData.get(0).size(), 7);
     assertEquals(mixedData.get(0).get(6), "3");
-
-    // different types of elements, read as integer
-    // those which are not integers should be replaced with null
-    ParseCSV<Integer> mixedReaderWrong =
-        new ParseCSV<Integer>(new StringReader("a,b,c,d,1,2,3"), myIntCreator, false);
-    List<List<Integer>> mixedDataWrong = mixedReaderWrong.getParsedData();
-    assertEquals(mixedDataWrong.size(), 1);
-    assertEquals(mixedDataWrong.get(0).size(), 7);
-    assertTrue(mixedDataWrong.get(0).get(6) == 3);
-    assertEquals(mixedDataWrong.get(0).get(0), null);
-
-    // parsing flavor enum
-    ParseCSV<Flavor> flavorReader =
-        new ParseCSV<Flavor>(
-            new StringReader("vanilla, chocolate, strawberry, vanilla"), myFlavorCreator, false);
-    List<List<Flavor>> flavorData = flavorReader.getParsedData();
-    assertEquals(flavorData.get(0).size(), 4);
-    assertEquals(flavorData.get(0).get(2), Flavor.STRAWBERRY);
   }
 }

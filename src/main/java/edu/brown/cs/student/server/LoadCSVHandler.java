@@ -31,17 +31,22 @@ public class LoadCSVHandler implements Route {
 
   @Override
   public Object handle(Request request, Response response) throws Exception {
+    this.responseMap = new HashMap<>();
+
     String filename = request.queryParams("filename");
+    if (filename == null){
+      this.responseMap.put("error_bad_request", "no file name specified");
+      return this.responseMap;
+    }
     String columnHeaders = request.queryParams("columnheaders");
     Boolean columnHeadersQuery = false;
     if (columnHeaders != null) {
-      if (columnHeaders.equals("true")) { //default is false??
+      if (columnHeaders.equals("true")) { //default is false
         columnHeadersQuery = true;
       }
     }
     String currentPath = new java.io.File(".").getCanonicalPath();
     filename = currentPath + "/data" + filename;
-    this.responseMap = new HashMap<>();
     ParseCSV<String> fileReader;
     CreatorFromRow<String> myCreator = new StringCreatorFromRow();
     try { //maybe we should make parameter for columnHeaders boolean, with default = 1 or something
