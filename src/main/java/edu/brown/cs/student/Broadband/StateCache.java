@@ -11,10 +11,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
-public class StateCache {
+public class StateCache implements Datasource {
 
     /**
      * A class that wraps a FileServer instance and caches responses
@@ -27,6 +29,7 @@ public class StateCache {
 //  public class CachedFileSearcher implements Searcher<String,String> {
 //    private final Searcher<String,String> wrappedSearcher;
     private final LoadingCache<StateCountyPair, Response> cache;
+    private Map<String, String> stateCodes;
 
     /**
      * Proxy class: wrap an instance of Searcher (of any kind) and cache
@@ -44,7 +47,7 @@ public class StateCache {
      * No parameters: cache will not evict entries.
      */
     public StateCache() {
-
+        this.stateCodes = new HashMap<>();
         // Look at the docs -- there are lots of builder parameters you can use
         //   including ones that affect garbage-collection (not needed for Server).
         this.cache = CacheBuilder.newBuilder()
@@ -114,12 +117,40 @@ public class StateCache {
                         });
     }
 
-    public Response get(String stateCode, String countyName) throws IllegalArgumentException {
-        // "get" is designed for concurrent situations; for today, use getUnchecked:
-        Response result = cache.getUnchecked(new StateCountyPair(stateCode, countyName));
+    @Override
+    public Object query(String stateName, String countyName, Map<String, Object> responseMap) throws IllegalArgumentException {
+        try {
+            if (this.stateCodes.isEmpty()) {
+                fillStateCodeMap();
+            }
+            if (this.stateCodes.get(stateName) == null) {
+                responseMap.put("result", "error_datasource");
+                return new NoBroadbandDataStateResponse(stateName, responseMap);
+            }
+            String stateCode = this.stateCodes.get(stateName);
+//            if (countyName.equals("")) {
+//                responseMap.put("result", "error_datasource");
+//                return new NoBroadbandDataCountyResponse(countyName, responseMap);
+//            }
+//            responseMap.put("response", this.source.get(stateCode, countyName).serialize());
+
+            // "get" is designed for concurrent situations; for today, use getUnchecked:
+            responseMap.put("response", cache.getUnchecked(new StateCountyPair(stateCode, countyName)).serialize());
+            responseMap.put("result", "success");
+            return responseMap;
+        } catch (Exception e) {
+            responseMap.put("result", "error_datasource");
+            return new NoBroadbandDataCountyResponse(countyName, responseMap);
+        }
+
+
+
+
+
+//        Response result = cache.getUnchecked(new StateCountyPair(stateCode, countyName));
         // For debugging and demo (would remove in a "real" version):
 //      System.out.println(cache.stats());
-        return result;
+//        return result;
     }
 
     private Response searchAPI(StateCountyPair target) throws IllegalArgumentException, IOException {
@@ -147,6 +178,35 @@ public class StateCache {
             }
         }
         throw new IllegalArgumentException();
+    }
+
+
+
+    private void fillStateCodeMap() {
+        try {
+
+            URL requestURL = new URL("https://api.census.gov/data/2010/dec/sf1?get=NAME&for=state:*");
+            HttpURLConnection conn = (HttpURLConnection) requestURL.openConnection();
+            conn.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 2) {
+                    // Assuming the first part is the state name and the second part is the state code
+                    String stateName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
+                    ;
+                    String stateCode = parts[1].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
+                    ;
+                    // Add to stateCodes map
+//                    parsedStates.put(stateCode, new HashMap<>());
+                    this.stateCodes.put(stateName.toLowerCase(), stateCode);
+                }
+            }
+            reader.close();
+        } catch (Exception e) {
+        }
     }
 }
 

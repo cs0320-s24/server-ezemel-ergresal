@@ -2,8 +2,8 @@ package edu.brown.cs.student.server;
 
 import static spark.Spark.after;
 
-
 import edu.brown.cs.student.Broadband.BroadbandHandler;
+import edu.brown.cs.student.Broadband.StateCache;
 import edu.brown.cs.student.SharedData;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class Server {
         new ViewCSVHandler(sharedData));
     Spark.get("searchcsv",
         new SearchCSVHandler(sharedData));
-    Spark.get("broadband", new BroadbandHandler());
+    Spark.get("broadband", new BroadbandHandler(new StateCache()));
     Spark.init();
     Spark.awaitInitialization();
     System.out.println("Server started at http://localhost:" + port);
