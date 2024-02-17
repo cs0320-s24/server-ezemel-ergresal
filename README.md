@@ -80,3 +80,5 @@ SEARCHCSV
 http://localhost:3232/searchcsv?object=Sol&column=3
 BROADBAND
 http://localhost:3232/broadband?state=new+york&county=westchester+county
+
+For testing, run the file TestHandlersNew in the testing folder.
