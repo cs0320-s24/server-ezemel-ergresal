@@ -1,4 +1,4 @@
-package edu.brown.cs.student.Broadband;
+package edu.brown.cs.student.Broadband.Responses;
 
 import com.squareup.moshi.Moshi;
 import java.util.Map;
@@ -21,7 +21,7 @@ public record NoBroadbandDataCountyResponse(String invalid_county, String county
   public String serialize() {
     Moshi moshi = new Moshi.Builder().build();
     return moshi
-        .adapter(edu.brown.cs.student.Broadband.NoBroadbandDataCountyResponse.class)
+        .adapter(edu.brown.cs.student.Broadband.Responses.NoBroadbandDataCountyResponse.class)
         .toJson(this);
   }
 }

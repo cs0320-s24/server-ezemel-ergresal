@@ -1,4 +1,4 @@
-package edu.brown.cs.student.Broadband;
+package edu.brown.cs.student.Broadband.Responses;
 
 import com.squareup.moshi.Moshi;
 

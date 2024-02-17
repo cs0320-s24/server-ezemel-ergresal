@@ -1,10 +1,9 @@
-package edu.brown.cs.student.server;
+package edu.brown.cs.student.Server.CSVHandling;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import edu.brown.cs.student.CSVNotLoadedResponse;
 import edu.brown.cs.student.Searcher.SearchCSV;
-import edu.brown.cs.student.SharedData;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package edu.brown.cs.student.Broadband;
+package edu.brown.cs.student.Broadband.Responses;
 
 import com.squareup.moshi.Moshi;
 import java.util.Map;
@@ -11,12 +11,12 @@ public record NoBroadbandDataStateResponse(
       this("state not found", state, responseMap);
     }
 
-    /**
-     * @return this response, serialized as Json
-     */
-    @Override
-    public String serialize() {
-      Moshi moshi = new Moshi.Builder().build();
-      return moshi.adapter(NoBroadbandDataStateResponse.class).toJson(this);
-    }
+  /**
+   * @return this response, serialized as Json
+   */
+  @Override
+  public String serialize() {
+    Moshi moshi = new Moshi.Builder().build();
+    return moshi.adapter(NoBroadbandDataStateResponse.class).toJson(this);
   }
+}

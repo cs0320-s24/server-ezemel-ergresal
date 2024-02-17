@@ -8,6 +8,9 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import edu.brown.cs.student.Broadband.Datasources.Datasource;
+import edu.brown.cs.student.Broadband.Responses.IncorrectParametersResponse;
+
 /**
  * sends back the broadband data from the ACS Census Data API key : key:
  * 51d2ea8997215acdf626ff79e2cb74c9bc4a56cc
@@ -23,29 +26,16 @@ import spark.Route;
  */
 public class BroadbandHandler implements Route {
 
-
-  //  private Map<String, Map<String, BroadbandResponse>> parsedStates = new HashMap<>(); // list of
-  // data for each state weve parsed
-  //   maps state to map of county codes to broadband response
-
   private Datasource source;
 
+  /**
+   * Takes a Datasource. Can be the included StateCache caching source, the mock source, or a source that the developer
+   * creates.
+   * @param source
+   */
   public BroadbandHandler(Datasource source) {
     this.source = source;
-
-    //            new StateCache();
   }
-
-  //  public BroadbandHandler(int maxEntries, int minutesToEvict) {
-  //    this.source = new StateCache(maxEntries, minutesToEvict);
-  //  }
-  //
-  //  public BroadbandHandler(int maxEntries) {
-  //    this.source = new StateCache(maxEntries);
-  //  }
-
-
-
 
   /**
    * This handle method needs to be filled by any class implementing Route. When the path set in
@@ -78,29 +68,6 @@ public class BroadbandHandler implements Route {
     String county = request.queryParams("county").toLowerCase();
     String state = request.queryParams("state").toLowerCase();
 
-
-    //    try {
-    //      if (this.stateCodes.isEmpty()) {
-    //        fillStateCodeMap();
-    //      }
-    //      if (this.stateCodes.get(state) == null) {
-    //        responseMap.put("result", "error_datasource");
-    //        return new NoBroadbandDataStateResponse(state, responseMap);
-    //      }
-    //      String stateCode = this.stateCodes.get(state);
-    //      if (county.equals("")) {
-    //        responseMap.put("result", "error_datasource");
-    //        return new NoBroadbandDataCountyResponse(county, responseMap);
-    //      }
     return this.source.query(state, county, responseMap);
-    // responseMap.put("response", this.source.query(state, county).serialize());
-    //      responseMap.put("result", "success");
-    //      return responseMap;
-    //    } catch (Exception e) {
-    //      responseMap.put("result", "error_datasource");
-    ////      System.out.println(e.getMessage());
-    //      return new NoBroadbandDataCountyResponse(county, responseMap).serialize();
-    //    }
-
   }
 }

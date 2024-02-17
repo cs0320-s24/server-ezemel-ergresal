@@ -3,11 +3,6 @@ package edu.brown.cs.student;
 import static org.testng.AssertJUnit.assertEquals;
 
 import edu.brown.cs.student.Broadband.BroadbandHandler;
-import edu.brown.cs.student.Broadband.StateCache;
-import edu.brown.cs.student.server.LoadCSVHandler;
-import edu.brown.cs.student.server.SearchCSVHandler;
-import edu.brown.cs.student.server.Server;
-import edu.brown.cs.student.server.ViewCSVHandler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +17,30 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import spark.Spark;
+ import edu.brown.cs.student.Broadband.BroadbandHandler;
+
+ import edu.brown.cs.student.Broadband.Datasources.StateCache;
+ import edu.brown.cs.student.Server.CSVHandling.LoadCSVHandler;
+ import edu.brown.cs.student.Server.CSVHandling.SearchCSVHandler;
+ import edu.brown.cs.student.Server.CSVHandling.SharedData;
+ import edu.brown.cs.student.Server.CSVHandling.ViewCSVHandler;
+
+ import java.io.BufferedReader;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.InputStreamReader;
+ import java.net.HttpURLConnection;
+ import java.net.URL;
+ import java.util.ArrayList;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+
+ import edu.brown.cs.student.Server.Server;
+ import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeAll;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ import spark.Spark;
 
 public class TestHandlersNew {
 
@@ -130,16 +149,9 @@ public class TestHandlersNew {
     // viewing csv
     HttpURLConnection clientConnectionFile = tryRequest("viewcsv");
     assertEquals(200, clientConnectionFile.getResponseCode());
-    InputStream inputStream = clientConnectionFile.getInputStream();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-    String output = reader.readLine();
-    reader.close();
-    inputStream.close();
-  }
-  @Test
-  public void testSearchHandler() throws IOException {
+
     // searching object, found
-    tryRequest("loadcsv?filename=/stars/ten-star.csv");
+//    tryRequest("loadcsv?filename=/stars/ten-star.csv");
 
     HttpURLConnection clientConnectionSearch = tryRequest("searchcsv?object=Sol");
     assertEquals(200, clientConnectionSearch.getResponseCode());
@@ -148,7 +160,7 @@ public class TestHandlersNew {
     String output = reader.readLine();
     reader.close();
     inputStream.close();
-    assertEquals(output, "/stars/ten-star.csv loaded successfully!");
+    assertEquals(output, "{\"searchedObject\":\"Sol\",\"responseMap\":{\"found rows\":[[\"0\",\"Sol\",\"0\",\"0\",\"0\"]],\"response_type\":\"'Sol' found in row 0: [0, Sol, 0, 0, 0]\"}}");
 
     // searching object, not found
     HttpURLConnection clientConnectionSearch2 = tryRequest("searchcsv?object=NULL");
@@ -165,16 +177,6 @@ public class TestHandlersNew {
     // searching object, column in bounds, not found
     HttpURLConnection clientConnectionSearch6 = tryRequest("searchcsv?object=Sol&column=0");
     assertEquals(200, clientConnectionSearch6.getResponseCode());
-
-    //    InputStream inputStream = clientConnectionView.getInputStream();
-    //    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-    //    String output = reader.readLine();
-    //    reader.close();
-    //    inputStream.close();
-    //    Moshi moshi = new Moshi.Builder().build();
-    //    // Initializes an adapter to an Activity class then uses it to parse the JSON.
-    //    JsonAdapter<String> adapter = moshi.adapter(String.class);
-    //    String activity = adapter.fromJson(output);
   }
 
   @Test
@@ -199,5 +201,15 @@ public class TestHandlersNew {
     // no state
     HttpURLConnection clientBroadband5 = tryRequest("broadband?county=westchester+county");
     assertEquals(200, clientBroadband5.getResponseCode());
+
+    // good state
+    HttpURLConnection clientBroadband6 = tryRequest("broadband?county=westchester+county&state=New+York");
+    assertEquals(200, clientBroadband5.getResponseCode());
+    InputStream inputStream = clientBroadband6.getInputStream();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+    String output = reader.readLine();
+    reader.close();
+    inputStream.close();
+    assertEquals(output, "NoBroadbandDataStateResponse[invalid_state=state not found, state=new york, responseMap={result=error_datasource}]");
   }
 }
