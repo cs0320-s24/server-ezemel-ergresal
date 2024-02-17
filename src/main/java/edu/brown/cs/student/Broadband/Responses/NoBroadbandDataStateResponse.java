@@ -7,9 +7,9 @@ import java.util.Map;
 public record NoBroadbandDataStateResponse(
     String invalid_state, String state, Map<String, Object> responseMap) implements Response {
 
-  public NoBroadbandDataStateResponse(String state, Map<String, Object> responseMap) {
-    this("state not found", state, responseMap);
-  }
+    public NoBroadbandDataStateResponse(String state, Map<String, Object> responseMap) {
+      this("state not found", state, responseMap);
+    }
 
   /**
    * @return this response, serialized as Json

@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class StateCache implements Datasource {
 
+
   /**
    * A class that wraps a FileServer instance and caches responses for efficiency. Notice that the
    * interface hasn't changed at all. This is an example of the proxy pattern; callers will interact
@@ -30,6 +31,7 @@ public class StateCache implements Datasource {
    */
   private final LoadingCache<StateCountyPair, Response> cache;
   private Map<String, String> stateCodes;
+
 
   /**
    * Proxy class: wrap an instance of Searcher (of any kind) and cache its results.
@@ -150,8 +152,10 @@ public class StateCache implements Datasource {
       responseMap.put("result", "error_datasource");
       return new NoBroadbandDataCountyResponse(countyName, responseMap);
     }
+
     // For debugging and demo (would remove in a "real" version):
     //      System.out.println(cache.stats());
+
   }
 
   /**

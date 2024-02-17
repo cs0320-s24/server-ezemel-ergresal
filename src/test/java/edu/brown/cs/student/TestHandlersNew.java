@@ -3,11 +3,19 @@
  import static org.testng.AssertJUnit.assertEquals;
 
  import edu.brown.cs.student.Broadband.BroadbandHandler;
+<<<<<<< HEAD
  import edu.brown.cs.student.Broadband.Datasources.StateCache;
  import edu.brown.cs.student.Server.CSVHandling.LoadCSVHandler;
  import edu.brown.cs.student.Server.CSVHandling.SearchCSVHandler;
  import edu.brown.cs.student.Server.CSVHandling.SharedData;
  import edu.brown.cs.student.Server.CSVHandling.ViewCSVHandler;
+=======
+ import edu.brown.cs.student.Broadband.StateCache;
+ import edu.brown.cs.student.server.LoadCSVHandler;
+ import edu.brown.cs.student.server.SearchCSVHandler;
+ import edu.brown.cs.student.server.Server;
+ import edu.brown.cs.student.server.ViewCSVHandler;
+>>>>>>> a06471fbd5d606f44b3ed48f40b028004cadad28
  import java.io.BufferedReader;
  import java.io.IOException;
  import java.io.InputStream;
@@ -26,16 +34,29 @@
  public class TestHandlersNew {
 
   private SharedData sharedData;
-  private static int port = 2222;
+//  private static int port = 2222
+  private Server server;
 
   @BeforeAll
   public static void setup_before_everything() {
-    Spark.port(port);
+    Spark.port(0);
     Logger.getLogger("").setLevel(Level.WARNING); // empty name = root logger
   }
 
   @BeforeEach
   public void setup() {
+    this.server = new Server(sharedData);
+    LoadCSVHandler loadCSVHandler = new LoadCSVHandler(sharedData);
+
+    Spark.get("loadcsv", loadCSVHandler);
+    Spark.get("viewcsv",
+        new ViewCSVHandler(sharedData));
+    Spark.get("searchcsv",
+        new SearchCSVHandler(sharedData));
+    Spark.get("broadband", new BroadbandHandler(new StateCache()));
+    Spark.init();
+    Spark.awaitInitialization();
+//    startServer(new SharedData(new ArrayList<>(), new ArrayList<>()));
     startServer(new SharedData(new ArrayList<>(), new ArrayList<>()));
     // Re-initialize state, etc. for _every_ test method run
     //    this.sharedData = mock something
@@ -57,15 +78,16 @@
   @AfterEach
   public void teardown() {
     // Gracefully stop Spark listening on both endpoints after each test
-    Spark.unmap("loadcsv");
-    Spark.unmap("viewcsv");
-    Spark.unmap("searchcsv");
-    Spark.unmap("broadband");
+//    Spark.unmap("loadcsv");
+//    Spark.unmap("viewcsv");
+//    Spark.unmap("searchcsv");
+//    Spark.unmap("broadband");
+    this.server = null;
     Spark.awaitStop(); // don't proceed until the server is stopped
   }
 
   private static HttpURLConnection tryRequest(String apiCall) throws IOException {
-    URL requestURL = new URL("http://localhost:" + port + "/" + apiCall);
+    URL requestURL = new URL("http://localhost:" + Spark.port() + "/" + apiCall);
     HttpURLConnection clientConnection = (HttpURLConnection) requestURL.openConnection();
 
     clientConnection.setRequestMethod("GET");
