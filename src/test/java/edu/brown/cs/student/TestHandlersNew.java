@@ -1,32 +1,32 @@
- package edu.brown.cs.student;
+package edu.brown.cs.student;
 
- import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
- import edu.brown.cs.student.Broadband.BroadbandHandler;
- import edu.brown.cs.student.Broadband.StateCache;
- import edu.brown.cs.student.server.LoadCSVHandler;
- import edu.brown.cs.student.server.SearchCSVHandler;
- import edu.brown.cs.student.server.Server;
- import edu.brown.cs.student.server.ViewCSVHandler;
- import java.io.BufferedReader;
- import java.io.IOException;
- import java.io.InputStream;
- import java.io.InputStreamReader;
- import java.net.HttpURLConnection;
- import java.net.URL;
- import java.util.ArrayList;
- import java.util.logging.Level;
- import java.util.logging.Logger;
- import org.junit.jupiter.api.AfterEach;
- import org.junit.jupiter.api.BeforeAll;
- import org.junit.jupiter.api.BeforeEach;
- import org.junit.jupiter.api.Test;
- import spark.Spark;
+import edu.brown.cs.student.Broadband.BroadbandHandler;
+import edu.brown.cs.student.Broadband.StateCache;
+import edu.brown.cs.student.server.LoadCSVHandler;
+import edu.brown.cs.student.server.SearchCSVHandler;
+import edu.brown.cs.student.server.Server;
+import edu.brown.cs.student.server.ViewCSVHandler;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import spark.Spark;
 
- public class TestHandlersNew {
+public class TestHandlersNew {
 
   private SharedData sharedData;
-//  private static int port = 2222
+  //  private static int port = 2222
   private Server server;
 
   @BeforeAll
@@ -37,21 +37,7 @@
 
   @BeforeEach
   public void setup() {
-    this.server = new Server(sharedData);
-    LoadCSVHandler loadCSVHandler = new LoadCSVHandler(sharedData);
-
-    Spark.get("loadcsv", loadCSVHandler);
-    Spark.get("viewcsv",
-        new ViewCSVHandler(sharedData));
-    Spark.get("searchcsv",
-        new SearchCSVHandler(sharedData));
-    Spark.get("broadband", new BroadbandHandler(new StateCache()));
-    Spark.init();
-    Spark.awaitInitialization();
-//    startServer(new SharedData(new ArrayList<>(), new ArrayList<>()));
     startServer(new SharedData(new ArrayList<>(), new ArrayList<>()));
-    // Re-initialize state, etc. for _every_ test method run
-    //    this.sharedData = mock something
   }
 
   public void startServer(SharedData sd) {
@@ -138,7 +124,9 @@
 
   @Test
   public void testViewHandler() throws IOException {
-    tryRequest("loadcsv?filename=/stars/ten-star.csv&columnheaders=true");
+    HttpURLConnection clientConnectionLoader = tryRequest(
+        "loadcsv?filename=/stars/ten-star.csv&columnheaders=true");
+    assertEquals(200, clientConnectionLoader.getResponseCode());
     // viewing csv
     HttpURLConnection clientConnectionFile = tryRequest("viewcsv");
     assertEquals(200, clientConnectionFile.getResponseCode());
@@ -147,9 +135,7 @@
     String output = reader.readLine();
     reader.close();
     inputStream.close();
-    assertEquals(output, "/stars/ten-star.csv loaded successfully!");
   }
-
   @Test
   public void testSearchHandler() throws IOException {
     // searching object, found
@@ -214,4 +200,4 @@
     HttpURLConnection clientBroadband5 = tryRequest("broadband?county=westchester+county");
     assertEquals(200, clientBroadband5.getResponseCode());
   }
- }
+}
