@@ -3,7 +3,8 @@ package edu.brown.cs.student.Server.CSVHandling;
 import java.util.List;
 
 /**
- * CSV data wrapper for storage and dependency injection for the different csv handlers for the csv related endpoints.
+ * CSV data wrapper for storage and dependency injection for the different csv handlers for the csv
+ * related endpoints.
  */
 public class SharedData {
 
@@ -13,11 +14,12 @@ public class SharedData {
 
   /**
    * For initializing with empty lists.
+   *
    * @param csvData
    * @param columnHeaders
    */
   public SharedData(List<List<String>> csvData, List<String> columnHeaders) {
-    assert(csvData.isEmpty()&&columnHeaders.isEmpty());
+    assert (csvData.isEmpty() && columnHeaders.isEmpty());
     this.csvData = csvData;
     this.columnHeaders = columnHeaders;
     this.isEmpty = true;
@@ -25,6 +27,7 @@ public class SharedData {
 
   /**
    * For inserting data.
+   *
    * @param csvData
    * @param columnHeaders
    */
@@ -36,6 +39,7 @@ public class SharedData {
 
   /**
    * Getter for csvData
+   *
    * @return
    */
   public List<List<String>> getCsvData() {
@@ -44,6 +48,7 @@ public class SharedData {
 
   /**
    * Getter for columnHeaders
+   *
    * @return
    */
   public List<String> getColumnHeaders() {
@@ -52,6 +57,7 @@ public class SharedData {
 
   /**
    * Getter for isEmpty
+   *
    * @return
    */
   public boolean isEmpty() {

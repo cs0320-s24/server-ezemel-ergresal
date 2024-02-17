@@ -1,5 +1,7 @@
 package edu.brown.cs.student.Broadband;
 
+import edu.brown.cs.student.Broadband.Datasources.Datasource;
+import edu.brown.cs.student.Broadband.Responses.IncorrectParametersResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -7,9 +9,6 @@ import java.util.Map;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
-import edu.brown.cs.student.Broadband.Datasources.Datasource;
-import edu.brown.cs.student.Broadband.Responses.IncorrectParametersResponse;
 
 /**
  * sends back the broadband data from the ACS Census Data API key : key:
@@ -29,8 +28,9 @@ public class BroadbandHandler implements Route {
   private Datasource source;
 
   /**
-   * Takes a Datasource. Can be the included StateCache caching source, the mock source, or a source that the developer
-   * creates.
+   * Takes a Datasource. Can be the included StateCache caching source, the mock source, or a source
+   * that the developer creates.
+   *
    * @param source
    */
   public BroadbandHandler(Datasource source) {

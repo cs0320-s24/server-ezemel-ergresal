@@ -5,6 +5,7 @@ import java.util.Map;
 
 /**
  * incorrect parameters response to be used when user doesn't input correct parameters
+ *
  * @param error
  * @param responseMap
  */

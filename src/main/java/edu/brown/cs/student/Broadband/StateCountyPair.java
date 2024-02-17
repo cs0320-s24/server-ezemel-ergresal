@@ -3,8 +3,9 @@ package edu.brown.cs.student.Broadband;
 import java.util.Objects;
 
 /**
- * Custom form of the Pair class that allows for mapping to BroadbandResponses from state and county names in the cache
- * or other data sources.
+ * Custom form of the Pair class that allows for mapping to BroadbandResponses from state and county
+ * names in the cache or other data sources.
+ *
  * @param state
  * @param county
  */
@@ -12,7 +13,8 @@ public record StateCountyPair(String state, String county) {
 
   /**
    * Equals method overwritten to ensure that comparisons are accurate.
-   * @param o   the reference object with which to compare.
+   *
+   * @param o the reference object with which to compare.
    * @return
    */
   @Override
@@ -27,6 +29,7 @@ public record StateCountyPair(String state, String county) {
 
   /**
    * hashCode overwrite to ensure that hashing is accurate for storage in data source.
+   *
    * @return
    */
   @Override

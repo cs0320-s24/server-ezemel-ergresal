@@ -72,13 +72,17 @@ handler itself, we were testing the algorithms used in the caching class.
 # How to
 Here are some example webpage server requests which may be used in concurrency with the 
 server program in order to operate the commands as described above:
-LOADCSV
-http://localhost:3232/loadcsv?filename=/stars/ten-star.csv&columnheaders=true
-VIEWCSV
-http://localhost:3232/viewcsv
-SEARCHCSV
-http://localhost:3232/searchcsv?object=Sol&column=3
-BROADBAND
-http://localhost:3232/broadband?state=new+york&county=westchester+county
+
+**LOADCSV**
+- http://localhost:3232/loadcsv?filename=/stars/ten-star.csv&columnheaders=true
+
+**VIEWCSV**
+- http://localhost:3232/viewcsv
+
+**SEARCHCSV**
+- http://localhost:3232/searchcsv?object=Sol&column=3
+
+**BROADBAND**
+- http://localhost:3232/broadband?state=new+york&county=westchester+county
 
 For testing, run the file TestHandlersNew in the testing folder.
