@@ -1,8 +1,14 @@
-package edu.brown.cs.student.Broadband;
+package edu.brown.cs.student.Broadband.Datasources;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import edu.brown.cs.student.Broadband.*;
+import edu.brown.cs.student.Broadband.Responses.NoBroadbandDataCountyResponse;
+import edu.brown.cs.student.Broadband.Responses.NoBroadbandDataStateResponse;
+import edu.brown.cs.student.Broadband.Responses.Response;
+import edu.brown.cs.student.Broadband.Responses.BroadbandResponse;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,10 +28,7 @@ public class StateCache implements Datasource {
    *
    * <p>This version uses a Guava cache class to manage the cache.
    */
-  //  public class CachedFileSearcher implements Searcher<String,String> {
-  //    private final Searcher<String,String> wrappedSearcher;
   private final LoadingCache<StateCountyPair, Response> cache;
-
   private Map<String, String> stateCodes;
 
   /**
@@ -60,7 +63,7 @@ public class StateCache implements Datasource {
   }
 
   /**
-   * Allows for specifying maximum entries and time to evict after writing. To in essence avoid
+   * Allows for specifying maximum entries and time to evict after writing. To avoid
    * caching, set maxSize to 0.
    *
    * @param maxSize - maximum number of entries in the cache
@@ -91,6 +94,10 @@ public class StateCache implements Datasource {
                 });
   }
 
+  /**
+   * Cache based on a preset max cache size. Does not evict entries after a preset amount of time.
+   * @param maxSize
+   */
   public StateCache(int maxSize) {
 
     // Look at the docs -- there are lots of builder parameters you can use
@@ -113,6 +120,15 @@ public class StateCache implements Datasource {
                 });
   }
 
+  /**
+   * Search for the information for a given state and county name. Ends with an error response if the state name
+   * or county name are not found, and otherwise searches the cache for the information.
+   * @param stateName
+   * @param countyName
+   * @param responseMap
+   * @return
+   * @throws IllegalArgumentException
+   */
   @Override
   public Object query(String stateName, String countyName, Map<String, Object> responseMap)
       throws IllegalArgumentException {
@@ -120,33 +136,34 @@ public class StateCache implements Datasource {
       if (this.stateCodes.isEmpty()) {
         fillStateCodeMap();
       }
-      if (this.stateCodes.get(stateName) == null) {
+      if (this.stateCodes.get(stateName) == null) { //incorrect state name
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataStateResponse(stateName, responseMap);
       }
       String stateCode = this.stateCodes.get(stateName);
-      //            if (countyName.equals("")) {
-      //                responseMap.put("result", "error_datasource");
-      //                return new NoBroadbandDataCountyResponse(countyName, responseMap);
-      //            }
-      //            responseMap.put("response", this.source.get(stateCode, countyName).serialize());
 
-      // "get" is designed for concurrent situations; for today, use getUnchecked:
-      responseMap.put(
+      responseMap.put( // "get" is designed for concurrent situations; for today, use getUnchecked:
           "response", cache.getUnchecked(new StateCountyPair(stateCode, countyName)).serialize());
       responseMap.put("result", "success");
       return responseMap;
-    } catch (Exception e) {
+    } catch (Exception e) { //incorrect county name
       responseMap.put("result", "error_datasource");
       return new NoBroadbandDataCountyResponse(countyName, responseMap);
     }
-
-    //        Response result = cache.getUnchecked(new StateCountyPair(stateCode, countyName));
     // For debugging and demo (would remove in a "real" version):
     //      System.out.println(cache.stats());
-    //        return result;
   }
 
+  /**
+   * SearchAPI is called if the cache does not contain the information that is requested in query.
+   * Requests from the census API for the broadband percentage estimates for the given state and searches
+   * through the list to find the specified county. If the county isn't found, throws an IllegalArgumentException.
+   * Otherwise, returns the successful BroadbandResponse.
+   * @param target
+   * @return Response
+   * @throws IllegalArgumentException
+   * @throws IOException
+   */
   private Response searchAPI(StateCountyPair target) throws IllegalArgumentException, IOException {
     URL requestURL =
         new URL(
@@ -160,14 +177,9 @@ public class StateCache implements Datasource {
     String line = reader.readLine(); // don't want to parse the first row (headers)
     while ((line = reader.readLine()) != null) {
       String[] parts = line.split(",");
-      //          if (parts.length >= 4) {
       String countyName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
       String stateName = parts[1].replaceAll("\"", "").trim();
       String countyPercentage = parts[2].replaceAll("\"", "").trim();
-      //          String stateCodee = parts[3].replaceAll("\"", "").trim();
-
-      //          String countyCode = parts[4].replaceAll("\"", "").trim().replaceAll("\\[|\\]",
-      // "");
       if (countyName.toLowerCase().equals(target.county())) {
         reader.close();
         return new BroadbandResponse(
@@ -177,6 +189,10 @@ public class StateCache implements Datasource {
     throw new IllegalArgumentException();
   }
 
+  /**
+   * Helper method to populate the map of state names to state codes. Stores the information so the request only needs
+   * to be made the first time.
+   */
   private void fillStateCodeMap() {
     try {
 
@@ -191,11 +207,8 @@ public class StateCache implements Datasource {
         if (parts.length >= 2) {
           // Assuming the first part is the state name and the second part is the state code
           String stateName = parts[0].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-
           String stateCode = parts[1].replaceAll("\"", "").trim().replaceAll("\\[|\\]", "");
-
           // Add to stateCodes map
-          //                    parsedStates.put(stateCode, new HashMap<>());
           this.stateCodes.put(stateName.toLowerCase(), stateCode);
         }
       }

@@ -1,15 +1,25 @@
-package edu.brown.cs.student.server;
+package edu.brown.cs.student.Broadband.Datasources;
 
-import edu.brown.cs.student.Broadband.BroadbandResponse;
-import edu.brown.cs.student.Broadband.Datasource;
-import edu.brown.cs.student.Broadband.NoBroadbandDataCountyResponse;
-import edu.brown.cs.student.Broadband.NoBroadbandDataStateResponse;
+import edu.brown.cs.student.Broadband.Responses.BroadbandResponse;
+import edu.brown.cs.student.Broadband.Responses.NoBroadbandDataCountyResponse;
+import edu.brown.cs.student.Broadband.Responses.NoBroadbandDataStateResponse;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * Mock data source only storing information about Solano County, California
+ */
 public class MockSource implements Datasource {
 
+    /**
+     * Query method only gives a successful response from Solano County, California.
+     * Otherwise, gives error responses.
+     * @param state
+     * @param county
+     * @param responseMap
+     * @return Response
+     */
     @Override
     public Object query(String state, String county, Map<String, Object> responseMap) {
         if(state.equals("california")) {
