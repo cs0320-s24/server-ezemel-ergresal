@@ -4,11 +4,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import edu.brown.cs.student.Broadband.*;
+import edu.brown.cs.student.Broadband.Responses.BroadbandResponse;
 import edu.brown.cs.student.Broadband.Responses.NoBroadbandDataCountyResponse;
 import edu.brown.cs.student.Broadband.Responses.NoBroadbandDataStateResponse;
 import edu.brown.cs.student.Broadband.Responses.Response;
-import edu.brown.cs.student.Broadband.Responses.BroadbandResponse;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 public class StateCache implements Datasource {
 
-
   /**
    * A class that wraps a FileServer instance and caches responses for efficiency. Notice that the
    * interface hasn't changed at all. This is an example of the proxy pattern; callers will interact
@@ -30,8 +28,8 @@ public class StateCache implements Datasource {
    * <p>This version uses a Guava cache class to manage the cache.
    */
   private final LoadingCache<StateCountyPair, Response> cache;
-  private Map<String, String> stateCodes;
 
+  private Map<String, String> stateCodes;
 
   /**
    * Proxy class: wrap an instance of Searcher (of any kind) and cache its results.
@@ -65,8 +63,8 @@ public class StateCache implements Datasource {
   }
 
   /**
-   * Allows for specifying maximum entries and time to evict after writing. To avoid
-   * caching, set maxSize to 0.
+   * Allows for specifying maximum entries and time to evict after writing. To avoid caching, set
+   * maxSize to 0.
    *
    * @param maxSize - maximum number of entries in the cache
    * @param minutesToEvict - time in minutes before an entry is evicted
@@ -98,6 +96,7 @@ public class StateCache implements Datasource {
 
   /**
    * Cache based on a preset max cache size. Does not evict entries after a preset amount of time.
+   *
    * @param maxSize
    */
   public StateCache(int maxSize) {
@@ -123,8 +122,10 @@ public class StateCache implements Datasource {
   }
 
   /**
-   * Search for the information for a given state and county name. Ends with an error response if the state name
-   * or county name are not found, and otherwise searches the cache for the information.
+   * Search for the information for a given state and county name. Ends with an error response if
+   * the state name or county name are not found, and otherwise searches the cache for the
+   * information.
+   *
    * @param stateName
    * @param countyName
    * @param responseMap
@@ -138,7 +139,7 @@ public class StateCache implements Datasource {
       if (this.stateCodes.isEmpty()) {
         fillStateCodeMap();
       }
-      if (this.stateCodes.get(stateName) == null) { //incorrect state name
+      if (this.stateCodes.get(stateName) == null) { // incorrect state name
         responseMap.put("result", "error_datasource");
         return new NoBroadbandDataStateResponse(stateName, responseMap);
       }
@@ -148,7 +149,7 @@ public class StateCache implements Datasource {
           "response", cache.getUnchecked(new StateCountyPair(stateCode, countyName)).serialize());
       responseMap.put("result", "success");
       return responseMap;
-    } catch (Exception e) { //incorrect county name
+    } catch (Exception e) { // incorrect county name
       responseMap.put("result", "error_datasource");
       return new NoBroadbandDataCountyResponse(countyName, responseMap);
     }
@@ -160,9 +161,10 @@ public class StateCache implements Datasource {
 
   /**
    * SearchAPI is called if the cache does not contain the information that is requested in query.
-   * Requests from the census API for the broadband percentage estimates for the given state and searches
-   * through the list to find the specified county. If the county isn't found, throws an IllegalArgumentException.
-   * Otherwise, returns the successful BroadbandResponse.
+   * Requests from the census API for the broadband percentage estimates for the given state and
+   * searches through the list to find the specified county. If the county isn't found, throws an
+   * IllegalArgumentException. Otherwise, returns the successful BroadbandResponse.
+   *
    * @param target
    * @return Response
    * @throws IllegalArgumentException
@@ -194,8 +196,8 @@ public class StateCache implements Datasource {
   }
 
   /**
-   * Helper method to populate the map of state names to state codes. Stores the information so the request only needs
-   * to be made the first time.
+   * Helper method to populate the map of state names to state codes. Stores the information so the
+   * request only needs to be made the first time.
    */
   private void fillStateCodeMap() {
     try {

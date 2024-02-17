@@ -9,16 +9,16 @@ public class BroadbandResponse implements Response {
   private String state;
   private String percentageBroadband;
 
-
   /**
    * object which has been parsed from API census data from server
+   *
    * @param time
    * @param countyName
    * @param state
    * @param percentageBroadband
    */
-
-  public BroadbandResponse(String time, String countyName, String state, String percentageBroadband) {
+  public BroadbandResponse(
+      String time, String countyName, String state, String percentageBroadband) {
     this.timeZone = "EST";
     this.time = time;
     this.countyName = countyName;
